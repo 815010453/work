@@ -127,3 +127,14 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+outputs
+.gitignore
+example
+task1_sample.txt
+task2_sample.txt
+task3_sample.txt
+task4_sample.txt
+task5_sample.txt
+dataset.csv
+test.py
