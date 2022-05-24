@@ -16,7 +16,7 @@ def main(argv):
         print("The input arguments are in correct")
         return None
     finally:
-        """task one: build kdtree"""
+        """task one and two: build kdtree for query"""
         if task == "1":
             df_dataset = pd.read_table(str(input_file), sep=',', usecols=[0, 1, 2])
             df_test = pd.read_table(str(test_file), header=None, sep=' ', names=['longitude', 'latitude', 'k'])
@@ -33,6 +33,11 @@ def main(argv):
                 temp_test = test[j]
                 distance, indices = kd_tree.query([temp_test], k=i, return_distance=True)
                 indices = indices[0]
+                id1 = []
+                # change index to id
+                for i1 in indices:
+                    id1.append(df_dataset['id'][i1])
+                indices = np.array(id1,dtype=int)
                 distance = np.array(distance[0])
                 for d in distance:
                     eq_index = indices[distance == d]
@@ -51,16 +56,15 @@ def main(argv):
                 j += 1
                 with open('outputs/task1_sample_results.txt', 'a', encoding='utf-8') as f:
                     for index, v in enumerate(indices):
-                        # id = index + 1
-                        f.write(str(v + 1))
+                        f.write(str(v))
                         f.write('\n')
         elif task == "2":
             df_dataset = pd.read_table(str(input_file), sep=',')
-            df_test = pd.read_table(str(test_file), header=None, sep=' ',
+            df_test = pd.read_table(str(test_file), header=None, sep=' +',
                                     names=['longitude', 'latitude', 'k', 'day_start', 'time_start', 'day_end',
                                            'time_end'])
             print(df_dataset)
-            print(df_test.dayend)
+            print(df_test.day_end)
 
 
 if __name__ == '__main__':
