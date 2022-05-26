@@ -24,7 +24,10 @@ class Point(object):
     def __str__(self) -> str:
         return str(self.x) + ',' + str(self.y) + ',' + ','.join(self.attr.values())
 
-    def is_queryItem(self, querys) -> bool:
+    def __repr__(self) -> str:
+        return str(self.x) + ',' + str(self.y) + ',' + ','.join(self.attr.values())
+
+    def is_queryItem(self, querys=None) -> bool:
         if querys is None:
             return True
 
@@ -45,7 +48,7 @@ class Rectangle(object):
     def is_disjoin(self, other: 'Rectangle') -> bool:
         return self.xMin > other.xMax or self.xMax < other.xMin or self.yMin > other.yMax or self.yMax < other.yMin
 
-    def split_rect(self, other: 'Rectangle') -> 'dict[str, Rectangle]':
+    def split_rect(self) -> 'dict[str, Rectangle]':
         x_mid = (self.xMin + self.xMax) / 2
         y_mid = (self.yMin + self.yMax) / 2
         return {
@@ -77,17 +80,25 @@ class QuadTree(object):
         if self.children['NW'] is not None:
             for point in self.points:
                 self.children[self.get_sub_tree(point)].insert(point)
-
-    def delete(self, point: Point) -> bool:
-        pass
-
-    def merge(self):
-        pass
+                self.points = []
+        else:
+            if len(self.points) > self.limit:
+                split_rec_dict = self.rect.split_rect()
+                for key in self.children.keys():
+                    self.children[key] = QuadTree(split_rec_dict[key], points=[])
+                for point in self.points:
+                    self.children[self.get_sub_tree(point)].insert(point)
+                self.points = []
 
     def get_sub_tree(self, point: Point) -> str:
-        pass
+        rec_dict = self.rect.split_rect()
+        for key in rec_dict.keys():
+            if rec_dict[key].is_contain(point):
+                print(key)
+                return key
+        return ''
 
-    def window_query(self, rect: Rectangle, querys) -> list[Point]:
+    def window_query(self, rect: Rectangle, querys=None) -> ' list[Point]':
         res = []
         if not self.rect.is_disjoin(rect):
             if self.children['NW'] is not None:
@@ -101,6 +112,9 @@ class QuadTree(object):
 
 
 def main(argv):
+    task = 0
+    input_file = ''
+    test_file = ''
     try:
         input_file = argv[0]
         task = argv[1]
@@ -232,14 +246,13 @@ def main(argv):
             df_test.latitude2 = pd.to_numeric(df_test.latitude2)
             test_coord2 = df_test[['longitude2', 'latitude2']].to_numpy(dtype=float)
             dataset = df_dataset[['longitude', 'latitude']].to_numpy(dtype=float)
-            # construct kd-Tree
-            kd_tree = KDTree(dataset, leaf_size=2)
             print(test_coord1)
             print(test_coord2)
             print(dataset)
             j = 0
             for temp_coord1 in test_coord1:
                 temp_coord2 = test_coord2[j]
+
         # elif task == "4":
         # elif task == 5":
 
