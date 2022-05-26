@@ -287,10 +287,94 @@ def main(argv):
 
         elif task == "4":
             """Task 4: build quadtree for query by case"""
-            df_dataset = pd.read_table(str(input_file), sep=',', usecols=[0, 1, 2])
-            df_test = pd.read_table(str(test_file), header=None, sep=' ',
-                                    names=['longitude1', 'latitude1', 'longitude2', 'latitude2'])
-        # elif task == 5":
+            """Task 3: build quadtree for query"""
+            df_dataset = pd.read_table(str(input_file), sep=',')
+            df_test = pd.read_table(str(test_file), header=None, sep=' +',
+                                    names=['longitude1', 'latitude1', 'longitude2', 'latitude2', 'day_start',
+                                           'time_start', 'day_end',
+                                           'time_end'], engine='python')
+            df_test.longitude1 = df_test.longitude1.str.replace("(", "", regex=True)
+            df_test.longitude1 = pd.to_numeric(df_test.longitude1)
+            test_coord1 = df_test[['longitude1', 'latitude1']].to_numpy(dtype=float)
+            df_test.latitude2 = df_test.latitude2.str.replace(")", "", regex=True)
+            df_test.latitude2 = pd.to_numeric(df_test.latitude2)
+            test_coord2 = df_test[['longitude2', 'latitude2']].to_numpy(dtype=float)
+            dataset = df_dataset[['longitude', 'latitude']].to_numpy(dtype=float)
+            s_id = df_dataset['id'].to_numpy(dtype=int)
+            df_dataset['datatime'] = df_dataset.date + '-' + df_dataset.time + ':00'
+            df_dataset.datatime = pd.to_datetime(df_dataset.datatime)
+
+            df_test.day_start = df_test.day_start.str.replace('(', '', regex=True)
+            df_test.day_start = df_test.day_start.str.replace('"', '')
+            df_test.time_start = df_test.time_start.str.replace('"', '')
+            df_test['datatime_begin'] = df_test.day_start + '-' + df_test.time_start
+            df_test.datatime_begin = pd.to_datetime(df_test.datatime_begin)
+
+            df_test.day_end = df_test.day_end.str.replace('"', '')
+            df_test.time_end = df_test.time_end.str.replace('"', '')
+            df_test.time_end = df_test.time_end.str.replace(')', '')
+            df_test['datatime_end'] = df_test.day_end + '-' + df_test.time_end
+            df_test.datatime_end = pd.to_datetime(df_test.datatime_end)
+            print(df_test.datatime_begin)
+            print(df_test.datatime_end)
+
+            x_max, y_max = np.max(dataset, axis=0)
+            x_min, y_min = np.min(dataset, axis=0)
+            rect_all = Rectangle(x_min, y_min, x_max, y_max)
+            unique_dataset, unique_index, dataset_inverse, dataset_count = np.unique(dataset, axis=0,
+                                                                                     return_index=True,
+                                                                                     return_counts=True,
+                                                                                     return_inverse=True)
+            # construct quadtree
+            q_tree = QuadTree(rect_all, [])
+            for index, coord in enumerate(unique_dataset):
+                attr = {'id': s_id[unique_index[index]]}
+                temp = Point(coord[0], coord[1], attr)
+                q_tree.insert(temp)
+            repeat_coord = []
+            for index, i in enumerate(unique_index):
+                if dataset_count[index] > 1:
+                    temp_coord = []
+                    idx = np.where(dataset_inverse == index)
+                    for j in idx[0]:
+                        temp_coord.append(s_id[j])
+                    repeat_coord.append(temp_coord)
+            j = 0
+            for temp_coord1 in test_coord1:
+                temp_coord2 = test_coord2[j]
+                temp_test_datatime_begin = df_test['datatime_begin'][j]
+                temp_test_datatime_end = df_test['datatime_end'][j]
+                window_coord = np.array([temp_coord1, temp_coord2])
+                x_max, y_max = np.max(window_coord, axis=0)
+                x_min, y_min = np.min(window_coord, axis=0)
+                rect_query = Rectangle(x_min, y_min, x_max, y_max)
+                res = q_tree.window_query(rect_query)
+                res_id = []
+                for i in res:
+                    res_id.append(i.attr['id'])
+                real_res = []
+                for i in res_id:
+                    for k in repeat_coord:
+                        if i in k:
+                            real_res.extend(k)
+                real_res = np.array(real_res)
+                real_res = np.unique(real_res)
+                # query by datatime
+                real_datatime_res = []
+                for i in real_res:
+                    id_index = np.argwhere(s_id == i)[0]
+                    if df_dataset['datatime'][id_index[0]] >= temp_test_datatime_begin or \
+                            df_dataset['datatime'][id_index] <= temp_test_datatime_end:
+                        real_datatime_res.append(i)
+                print(real_datatime_res)
+                j += 1
+                # write file
+                with open('outputs/task4_sample_results.txt', 'a', encoding='utf-8') as f:
+                    for v in real_datatime_res:
+                        f.write(str(v))
+                        f.write('\n')
+
+    # elif task == 5":
 
 
 if __name__ == '__main__':
