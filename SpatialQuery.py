@@ -286,8 +286,7 @@ def main(argv):
                         f.write('\n')
 
         elif task == "4":
-            """Task 4: build quadtree for query by case"""
-            """Task 3: build quadtree for query"""
+            """Task 4: build quadtree for query and construct result by case"""
             df_dataset = pd.read_table(str(input_file), sep=',')
             df_test = pd.read_table(str(test_file), header=None, sep=' +',
                                     names=['longitude1', 'latitude1', 'longitude2', 'latitude2', 'day_start',
@@ -374,7 +373,8 @@ def main(argv):
                         f.write(str(v))
                         f.write('\n')
 
-    # elif task == 5":
+        #   elif task == 5":
+        """Task 4: build quadtree for query and construct result by case"""
 
 
 if __name__ == '__main__':
