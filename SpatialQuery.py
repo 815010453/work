@@ -8,7 +8,7 @@ import os
 
 
 class Point(object):
-    def __init__(self, x, y, attr) -> None:
+    def __init__(self, x, y, attr={}) -> None:
         self.x = x
         self.y = y
         self.attr = {}
@@ -22,14 +22,10 @@ class Point(object):
         return self.x == other.x and self.y == other.y and is_att_eq
 
     def __str__(self) -> str:
-        return str(self.x) + ',' + str(self.y) + ',' + ','.join(self.attr.values())
+        return str(self.x) + ',' + str(self.y) + ',' + str(self.attr['id'])
 
     def __repr__(self) -> str:
-        return str(self.x) + ',' + str(self.y) + ',' + ','.join(self.attr.values())
-
-    def is_queryItem(self, querys=None) -> bool:
-        if querys is None:
-            return True
+        return str(self.x) + ',' + str(self.y) + ',' + str(self.attr['id'])
 
 
 class Rectangle(object):
@@ -94,30 +90,26 @@ class QuadTree(object):
         rec_dict = self.rect.split_rect()
         for key in rec_dict.keys():
             if rec_dict[key].is_contain(point):
-                print(key)
                 return key
         return ''
 
-    def window_query(self, rect: Rectangle, querys=None) -> ' list[Point]':
+    def window_query(self, rect: Rectangle) -> ' list[Point]':
         res = []
         if not self.rect.is_disjoin(rect):
             if self.children['NW'] is not None:
                 for childKey in self.children:
-                    res += self.children[childKey].window_query(rect, querys)
+                    res += self.children[childKey].window_query(rect)
             else:
                 for pointItem in self.points:
-                    if pointItem.is_queryItem(querys) and rect.is_contain(pointItem):
+                    if rect.is_contain(pointItem):
                         res.append(pointItem)
         return res
 
 
 def main(argv):
-    task = 0
-    input_file = ''
-    test_file = ''
     try:
         input_file = argv[0]
-        task = argv[1]
+        task = str(argv[1])
         test_file = argv[2]
     except IndexError:
         print("The input arguments are in correct")
@@ -235,7 +227,7 @@ def main(argv):
                         f.write('\n')
                 j += 1
         elif task == "3":
-            """Task 3: build kd(2-d)-tree"""
+            """Task 3: build quadtree for query"""
             df_dataset = pd.read_table(str(input_file), sep=',', usecols=[0, 1, 2])
             df_test = pd.read_table(str(test_file), header=None, sep=' ',
                                     names=['longitude1', 'latitude1', 'longitude2', 'latitude2'])
@@ -246,15 +238,60 @@ def main(argv):
             df_test.latitude2 = pd.to_numeric(df_test.latitude2)
             test_coord2 = df_test[['longitude2', 'latitude2']].to_numpy(dtype=float)
             dataset = df_dataset[['longitude', 'latitude']].to_numpy(dtype=float)
-            print(test_coord1)
-            print(test_coord2)
-            print(dataset)
+            s_id = df_dataset['id'].to_numpy(dtype=int)
+            x_max, y_max = np.max(dataset, axis=0)
+            x_min, y_min = np.min(dataset, axis=0)
+            rect_all = Rectangle(x_min, y_min, x_max, y_max)
+            unique_dataset, unique_index, dataset_inverse, dataset_count = np.unique(dataset, axis=0,
+                                                                                     return_index=True,
+                                                                                     return_counts=True,
+                                                                                     return_inverse=True)
+            # construct quadtree
+            q_tree = QuadTree(rect_all, [])
+            for index, coord in enumerate(unique_dataset):
+                attr = {'id': s_id[unique_index[index]]}
+                temp = Point(coord[0], coord[1], attr)
+                q_tree.insert(temp)
+            repeat_coord = []
+            for index, i in enumerate(unique_index):
+                if dataset_count[index] > 1:
+                    temp_coord = []
+                    idx = np.where(dataset_inverse == index)
+                    for j in idx[0]:
+                        temp_coord.append(s_id[j])
+                    repeat_coord.append(temp_coord)
             j = 0
             for temp_coord1 in test_coord1:
                 temp_coord2 = test_coord2[j]
+                window_coord = np.array([temp_coord1, temp_coord2])
+                x_max, y_max = np.max(window_coord, axis=0)
+                x_min, y_min = np.min(window_coord, axis=0)
+                rect_query = Rectangle(x_min, y_min, x_max, y_max)
+                res = q_tree.window_query(rect_query)
+                res_id = []
+                for i in res:
+                    res_id.append(i.attr['id'])
+                real_res = []
+                for i in res_id:
+                    for k in repeat_coord:
+                        if i in k:
+                            real_res.extend(k)
+                real_res = np.array(real_res)
+                real_res = np.unique(real_res)
+                j += 1
+                # write file
+                with open('outputs/task3_sample_results.txt', 'a', encoding='utf-8') as f:
+                    for v in real_res:
+                        f.write(str(v))
+                        f.write('\n')
 
-        # elif task == "4":
+        elif task == "4":
+            """Task 4: build quadtree for query by case"""
+            df_dataset = pd.read_table(str(input_file), sep=',', usecols=[0, 1, 2])
+            df_test = pd.read_table(str(test_file), header=None, sep=' ',
+                                    names=['longitude1', 'latitude1', 'longitude2', 'latitude2'])
         # elif task == 5":
 
-    if __name__ == '__main__':
-        main(sys.argv[1:])
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
