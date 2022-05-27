@@ -26,20 +26,49 @@ class Point(object):
 
 
 class Rectangle(object):
-    def __init__(self, xMin, yMin, xMax, yMax) -> None:
+    def __init__(self, xMin=None, yMin=None, xMax=None, yMax=None, p1: Point = None, p2: Point = None, p3: Point = None,
+                 p4: Point = None) -> None:
+        # standard rectangle
         self.xMin = xMin
         self.yMin = yMin
         self.xMax = xMax
         self.yMax = yMax
+        # oblique rectangle
+        self.p1 = p1
+        self.p2 = p2
+        self.p3 = p3
+        self.p4 = p4
 
     def is_contain(self, point: Point) -> bool:
-        if self.xMin <= point.x <= self.xMax and self.yMin <= point.y <= self.yMax:
-            return True
+        if self.p1 is None:
+            # standard rectangle
+            if self.xMin <= point.x <= self.xMax and self.yMin <= point.y <= self.yMax:
+                return True
+            else:
+                return False
         else:
-            return False
+            # oblique rectangle
+            return Rectangle.GetCross(self.p1, self.p2, point) * Rectangle.GetCross(self.p3, self.p4, point) >= 0 \
+                   and Rectangle.GetCross(self.p2, self.p3, point) * Rectangle.GetCross(self.p4, self.p1, point) >= 0
 
-    def is_disjoin(self, other: 'Rectangle') -> bool:
-        return self.xMin > other.xMax or self.xMax < other.xMin or self.yMin > other.yMax or self.yMax < other.yMin
+    def is_disjoin(self, other) -> bool:
+        if isinstance(other, Rectangle):
+
+            if other.p1 is None:
+                # self and other are standard rectangles
+                return self.xMin > other.xMax or self.xMax < other.xMin \
+                       or self.yMin > other.yMax or self.yMax < other.yMin
+
+            else:
+                # self is a standard rectangle and other is an oblique rectangles
+                return False
+        elif isinstance(other, MultiRectangle):
+            # self is a standard rectangle and other are multiRectangles
+            for r in other.rectangles:
+                if not self.is_disjoin(r):
+                    return False
+
+            return True
 
     def split_rect(self) -> 'dict[str, Rectangle]':
         x_mid = (self.xMin + self.xMax) / 2
@@ -51,9 +80,57 @@ class Rectangle(object):
             'SE': Rectangle(x_mid, self.yMin, self.xMax, y_mid)
         }
 
+    @staticmethod
+    def GetCross(p1: Point, p2: Point, p: Point):
+        return (p2.x - p1.x) * (p.y - p1.y) - (p.x - p1.x) * (p2.y - p1.y)
+
+
+class MultiRectangle(object):
+    def __init__(self, points: list[Point], distance: float = 1) -> None:
+        self.rectangles = []
+        if len(points) < 2:
+            raise "input at least two points"
+        temp_points1 = points[1:]
+        for index in range(0, len(temp_points1)):
+            point1 = temp_points1[index]
+            point2 = points[index]
+            if point1.x == point2.x:
+                # standard rectangle
+                y_min = min([point1.y, point2.y])
+                y_max = max([point1.y, point2.y])
+                temp_rect = Rectangle(point1.x - distance, y_min, point1.x + distance, y_max)
+                self.rectangles.append(temp_rect)
+            elif point1.y == point2.y:
+                # standard rectangle
+                x_min = min([point1.x, point2.x])
+                x_max = max([point1.x, point2.x])
+
+                temp_rect = Rectangle(x_min, point1.y - distance, x_max, point1.y + distance)
+                self.rectangles.append(temp_rect)
+            else:
+                # oblique rectangle
+                # slope
+                k = (point2.y - point1.y) / (point2.x - point1.x)
+                x1 = point1.x + distance * k / (1 + k * k) ** 0.5
+                x2 = point1.x - distance * k / (1 + k * k) ** 0.5
+                x3 = point2.x + distance * k / (1 + k * k) ** 0.5
+                x4 = point2.x - distance * k / (1 + k * k) ** 0.5
+                p1 = Point(x1, point1.y - 1 / k * (x1 - point1.x))
+                p2 = Point(x2, point1.y - 1 / k * (x2 - point1.x))
+                p3 = Point(x3, point2.y - 1 / k * (x3 - point2.x))
+                p4 = Point(x4, point2.y - 1 / k * (x4 - point2.x))
+                temp_rect = Rectangle(p1=p1, p2=p2, p3=p3, p4=p4)
+                self.rectangles.append(temp_rect)
+
+    def is_contain(self, point: Point) -> bool:
+        for r in self.rectangles:
+            if r.is_contain(point):
+                return True
+        return False
+
 
 class QuadTree(object):
-    def __init__(self, rectangle, points=[], limit=1):
+    def __init__(self, rectangle: Rectangle, points=[], limit=1):
         self.rect: Rectangle = rectangle
         self.points: list = points
         self.count: int = 0
@@ -94,7 +171,7 @@ class QuadTree(object):
                 return key
         return ''
 
-    def window_query(self, rectangle: Rectangle) -> 'list[Point]':
+    def window_query(self, rectangle) -> 'list[Point]':
         result = []
         if not self.rect.is_disjoin(rectangle):
             if self.children['NW'] is not None:
@@ -356,9 +433,12 @@ def main(argv):
             df_test = pd.read_table(str(test_file), header=None, sep=r'"', names=['coord_group', 'date', 'distance'])
             df_test.coord_group = df_test.coord_group.str.replace('(', '', regex=True)
             df_test.coord_group = df_test.coord_group.str.replace(')', '', regex=True)
-            df_test.date = pd.to_datetime(df_test.date)
             df_test.distance = pd.to_numeric(df_test.distance)
             dis = df_test['distance'].to_numpy(dtype=float)
+            df_test['datetime_begin'] = df_test.date + '-00:00:00'
+            df_test.datetime_begin = pd.to_datetime(df_test.datetime_begin)
+            df_test['datetime_end'] = df_test.date + '-23:59:59'
+            df_test.datetime_end = pd.to_datetime(df_test.datetime_end)
             # construct quadtree
             x_max, y_max = np.max(dataset, axis=0)
             x_min, y_min = np.min(dataset, axis=0)
@@ -372,13 +452,33 @@ def main(argv):
 
             j = 0
             for d in dis:
+                temp_test_datetime_begin = df_test['datetime_begin'][j]
+                temp_test_datetime_end = df_test['datetime_end'][j]
+                d = d * 0.01
                 coord_group_str = str(df_test['coord_group'][j]).strip().split(' ')
                 coord_group = []
                 for i in range(0, len(coord_group_str) - 1, 2):
-                    temp_coord = [float(coord_group_str[i]), float(coord_group_str[i + 1])]
-                    coord_group.append(temp_coord)
-                print(coord_group)
+                    p = Point(float(coord_group_str[i]), float(coord_group_str[i + 1]))
+                    coord_group.append(p)
+                rect_query = MultiRectangle(coord_group, d)
+                res = q_tree.window_query(rect_query)
+                res_id = []
+                for i in res:
+                    res_id.append(i.attr['id'])
+                real_res = np.array(res_id)
+                real_res = np.sort(real_res)
+                # query by datetime
+                real_datetime_res = []
+                for i in real_res:
+                    id_index = np.argwhere(s_id == i)[0]
+                    if temp_test_datetime_begin <= df_dataset['datetime'][id_index[0]] <= temp_test_datetime_end:
+                        real_datetime_res.append(i)
                 j += 1
+                # write file
+                with open('outputs/task5_sample_results.txt', 'a', encoding='utf-8') as f:
+                    for v in real_datetime_res:
+                        f.write(str(v))
+                        f.write('\n')
 
 
 if __name__ == '__main__':
