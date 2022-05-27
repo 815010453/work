@@ -8,18 +8,15 @@ import os
 
 
 class Point(object):
-    def __init__(self, x, y, attr={}) -> None:
+    def __init__(self, x, y, attr=None) -> None:
         self.x = x
         self.y = y
-        self.attr = {}
-        for key in attr:
-            self.attr[key] = attr[key]
+        self.attr = attr
 
     def __eq__(self, other: 'Point') -> bool:
-        is_att_eq = True
-        for key in self.attr:
-            is_att_eq = is_att_eq and self.attr[key] == other.attr[key]
-        return self.x == other.x and self.y == other.y and is_att_eq
+        if not isinstance(other, Point):
+            return False
+        return self.x == other.x and self.y == other.y
 
     def __str__(self) -> str:
         return str(self.x) + ',' + str(self.y) + ',' + str(self.attr['id'])
@@ -56,8 +53,8 @@ class Rectangle(object):
 
 
 class QuadTree(object):
-    def __init__(self, rect, points=[], limit=1):
-        self.rect: Rectangle = rect
+    def __init__(self, rectangle, points=[], limit=1):
+        self.rect: Rectangle = rectangle
         self.points: list = points
         self.count: int = 0
         self.limit: int = limit
@@ -71,19 +68,23 @@ class QuadTree(object):
     def insert(self, point: Point) -> None:
         self.points.append(point)
         self.count += 1
+        # repeat coordinate
+        for p in self.points:
+            if p == point:
+                self.limit += 1
         if len(self.points) <= self.limit and self.children['NW'] is None:
             return None
         if self.children['NW'] is not None:
-            for point in self.points:
-                self.children[self.get_sub_tree(point)].insert(point)
-                self.points = []
+            for p in self.points:
+                self.children[self.get_sub_tree(point)].insert(p)
+            self.points = []
         else:
             if len(self.points) > self.limit:
                 split_rec_dict = self.rect.split_rect()
                 for key in self.children.keys():
                     self.children[key] = QuadTree(split_rec_dict[key], points=[])
-                for point in self.points:
-                    self.children[self.get_sub_tree(point)].insert(point)
+                for p in self.points:
+                    self.children[self.get_sub_tree(point)].insert(p)
                 self.points = []
 
     def get_sub_tree(self, point: Point) -> str:
@@ -93,17 +94,17 @@ class QuadTree(object):
                 return key
         return ''
 
-    def window_query(self, rect: Rectangle) -> 'list[Point]':
-        res = []
-        if not self.rect.is_disjoin(rect):
+    def window_query(self, rectangle: Rectangle) -> 'list[Point]':
+        result = []
+        if not self.rect.is_disjoin(rectangle):
             if self.children['NW'] is not None:
                 for childKey in self.children:
-                    res += self.children[childKey].window_query(rect)
+                    result += self.children[childKey].window_query(rectangle)
             else:
                 for pointItem in self.points:
-                    if rect.is_contain(pointItem):
-                        res.append(pointItem)
-        return res
+                    if rectangle.is_contain(pointItem):
+                        result.append(pointItem)
+        return result
 
 
 def main(argv):
@@ -115,7 +116,7 @@ def main(argv):
         task = int(argv[1])
         test_file = str(argv[2])
     except IndexError:
-        print("The input arguments are in correct")
+        print("The input arguments are incorrect")
         return None
     finally:
         if not os.path.exists('outputs'):
@@ -205,7 +206,7 @@ def main(argv):
                     continue
                 dataset = temp_dataset[['longitude', 'latitude']].to_numpy()
                 # construct kd-Tree
-                kd_tree = KDTree(dataset, leaf_size=2)
+                kd_tree = KDTree(temp_dataset, leaf_size=2)
                 distance, indices = kd_tree.query([temp_test_coord], k=t, return_distance=True)
                 indices = indices[0]
                 id1 = []
@@ -247,24 +248,14 @@ def main(argv):
             x_max, y_max = np.max(dataset, axis=0)
             x_min, y_min = np.min(dataset, axis=0)
             rect_all = Rectangle(x_min, y_min, x_max, y_max)
-            unique_dataset, unique_index, dataset_inverse, dataset_count = np.unique(dataset, axis=0,
-                                                                                     return_index=True,
-                                                                                     return_counts=True,
-                                                                                     return_inverse=True)
+
             # construct quadtree
             q_tree = QuadTree(rect_all, [])
-            for index, coord in enumerate(unique_dataset):
-                attr = {'id': s_id[unique_index[index]]}
+            for index, coord in enumerate(dataset):
+                attr = {'id': s_id[index]}
                 temp = Point(coord[0], coord[1], attr)
                 q_tree.insert(temp)
-            repeat_coord = []
-            for index, i in enumerate(unique_index):
-                if dataset_count[index] > 1:
-                    temp_coord = []
-                    idx = np.where(dataset_inverse == index)
-                    for j in idx[0]:
-                        temp_coord.append(s_id[j])
-                    repeat_coord.append(temp_coord)
+
             j = 0
             for temp_coord1 in test_coord1:
                 temp_coord2 = test_coord2[j]
@@ -276,13 +267,8 @@ def main(argv):
                 res_id = []
                 for i in res:
                     res_id.append(i.attr['id'])
-                real_res = []
-                for i in res_id:
-                    for k in repeat_coord:
-                        if i in k:
-                            real_res.extend(k)
-                real_res = np.array(real_res)
-                real_res = np.unique(real_res)
+                real_res = np.array(res_id)
+                real_res = np.sort(real_res)
                 j += 1
                 # write file
                 with open('outputs/task3_sample_results.txt', 'a', encoding='utf-8') as f:
@@ -316,35 +302,21 @@ def main(argv):
 
             df_test.day_end = df_test.day_end.str.replace('"', '')
             df_test.time_end = df_test.time_end.str.replace('"', '')
-            df_test.time_end = df_test.time_end.str.replace(')', '')
+            df_test.time_end = df_test.time_end.str.replace(')', '', regex=True)
             df_test['datetime_end'] = df_test.day_end + '-' + df_test.time_end
             df_test.datetime_end = pd.to_datetime(df_test.datetime_end)
             del df_dataset['date']
             del df_dataset['time']
-            print(df_test.datetime_begin)
-            print(df_test.datetime_end)
 
             x_max, y_max = np.max(dataset, axis=0)
             x_min, y_min = np.min(dataset, axis=0)
             rect_all = Rectangle(x_min, y_min, x_max, y_max)
-            unique_dataset, unique_index, dataset_inverse, dataset_count = np.unique(dataset, axis=0,
-                                                                                     return_index=True,
-                                                                                     return_counts=True,
-                                                                                     return_inverse=True)
             # construct quadtree
             q_tree = QuadTree(rect_all, [])
-            for index, coord in enumerate(unique_dataset):
-                attr = {'id': s_id[unique_index[index]]}
+            for index, coord in enumerate(dataset):
+                attr = {'id': s_id[index]}
                 temp = Point(coord[0], coord[1], attr)
                 q_tree.insert(temp)
-            repeat_coord = []
-            for index, i in enumerate(unique_index):
-                if dataset_count[index] > 1:
-                    temp_coord = []
-                    idx = np.where(dataset_inverse == index)
-                    for j in idx[0]:
-                        temp_coord.append(s_id[j])
-                    repeat_coord.append(temp_coord)
             j = 0
             for temp_coord1 in test_coord1:
                 temp_coord2 = test_coord2[j]
@@ -358,21 +330,14 @@ def main(argv):
                 res_id = []
                 for i in res:
                     res_id.append(i.attr['id'])
-                real_res = []
-                for i in res_id:
-                    for k in repeat_coord:
-                        if i in k:
-                            real_res.extend(k)
-                real_res = np.array(real_res)
-                real_res = np.unique(real_res)
+                real_res = np.array(res_id)
+                real_res = np.sort(real_res)
                 # query by datetime
                 real_datetime_res = []
                 for i in real_res:
                     id_index = np.argwhere(s_id == i)[0]
-                    if df_dataset['datetime'][id_index[0]] >= temp_test_datetime_begin or \
-                            df_dataset['datetime'][id_index] <= temp_test_datetime_end:
+                    if temp_test_datetime_begin <= df_dataset['datetime'][id_index[0]] <= temp_test_datetime_end:
                         real_datetime_res.append(i)
-                print(real_datetime_res)
                 j += 1
                 # write file
                 with open('outputs/task4_sample_results.txt', 'a', encoding='utf-8') as f:
@@ -394,29 +359,18 @@ def main(argv):
             df_test.date = pd.to_datetime(df_test.date)
             df_test.distance = pd.to_numeric(df_test.distance)
             dis = df_test['distance'].to_numpy(dtype=float)
-            j = 0
             # construct quadtree
             x_max, y_max = np.max(dataset, axis=0)
             x_min, y_min = np.min(dataset, axis=0)
             rect_all = Rectangle(x_min, y_min, x_max, y_max)
-            unique_dataset, unique_index, dataset_inverse, dataset_count = np.unique(dataset, axis=0,
-                                                                                     return_index=True,
-                                                                                     return_counts=True,
-                                                                                     return_inverse=True)
+
             q_tree = QuadTree(rect_all, [])
-            for index, coord in enumerate(unique_dataset):
-                attr = {'id': s_id[unique_index[index]]}
+            for index, coord in enumerate(dataset):
+                attr = {'id': s_id[index]}
                 temp = Point(coord[0], coord[1], attr)
                 q_tree.insert(temp)
-            repeat_coord = []
-            for index, i in enumerate(unique_index):
-                if dataset_count[index] > 1:
-                    temp_coord = []
-                    idx = np.where(dataset_inverse == index)
-                    for j in idx[0]:
-                        temp_coord.append(s_id[j])
-                    repeat_coord.append(temp_coord)
 
+            j = 0
             for d in dis:
                 coord_group_str = str(df_test['coord_group'][j]).strip().split(' ')
                 coord_group = []
