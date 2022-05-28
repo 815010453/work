@@ -61,7 +61,16 @@ class Rectangle(object):
 
             else:
                 # self is a standard rectangle and other is an oblique rectangles
-                return False
+                if other.is_contain(Point(self.xMin, self.yMin)) and other.is_contain(Point(self.xMin, self.ymax)) and \
+                        other.is_contain(Point(self.xMax, self.yMin)) and other.is_contain(Point(self.xMax, self.yMin)):
+                    # contain
+                    return False
+                if self.is_contain(other.p1) and self.is_contain(other.p2) and self.is_contain(
+                        other.p3) and self.is_contain(other.p4):
+                    # contain
+                    return False
+                if
+                    return False
         elif isinstance(other, MultiRectangle):
             # self is a standard rectangle and other are multiRectangles
             for r in other.rectangles:
@@ -83,6 +92,12 @@ class Rectangle(object):
     @staticmethod
     def GetCross(p1: Point, p2: Point, p: Point):
         return (p2.x - p1.x) * (p.y - p1.y) - (p.x - p1.x) * (p2.y - p1.y)
+
+    def is_intersected(self, other: 'Rectangle') -> bool:
+        lines = [[other.p1, other.p2], [other.p2, other.p3], [other.p3, other.p4], [other.p4, other.p1]]
+        for line in lines:
+
+
 
 
 class MultiRectangle(object):
@@ -113,8 +128,8 @@ class MultiRectangle(object):
                 k = (point2.y - point1.y) / (point2.x - point1.x)
                 x1 = point1.x + distance * k / (1 + k * k) ** 0.5
                 x2 = point1.x - distance * k / (1 + k * k) ** 0.5
-                x3 = point2.x + distance * k / (1 + k * k) ** 0.5
-                x4 = point2.x - distance * k / (1 + k * k) ** 0.5
+                x3 = point2.x - distance * k / (1 + k * k) ** 0.5
+                x4 = point2.x + distance * k / (1 + k * k) ** 0.5
                 p1 = Point(x1, point1.y - 1 / k * (x1 - point1.x))
                 p2 = Point(x2, point1.y - 1 / k * (x2 - point1.x))
                 p3 = Point(x3, point2.y - 1 / k * (x3 - point2.x))
