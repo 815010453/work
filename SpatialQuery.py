@@ -5,6 +5,7 @@ import pandas as pd
 from sklearn.neighbors import KDTree
 import numpy as np
 import os
+import time
 
 
 class Point(object):
@@ -53,7 +54,6 @@ class Rectangle(object):
 
     def is_disjoin(self, other) -> bool:
         if isinstance(other, Rectangle):
-
             if other.p1 is None:
                 # self and other are standard rectangles
                 return self.xMin > other.xMax or self.xMax < other.xMin \
@@ -69,8 +69,18 @@ class Rectangle(object):
                         other.p3) and self.is_contain(other.p4):
                     # contain
                     return False
-                if
-                    return False
+                lines1 = [[self.xMin, self.yMin, self.xMin, self.yMax], [self.xMin, self.yMin, self.xMax, self.yMin],
+                          [self.xMin, self.yMax, self.xMax, self.yMax], [self.xMax, self.yMin, self.xMax, self.yMax]]
+                lines2 = [[other.p1.x, other.p1.y, other.p2.x, other.p2.y],
+                          [other.p3.x, other.p3.y, other.p2.x, other.p2.y],
+                          [other.p3.x, other.p3.y, other.p4.x, other.p4.y],
+                          [other.p1.x, other.p1.y, other.p4.x, other.p4.y]]
+                for l1 in lines1:
+                    for l2 in lines2:
+                        if Rectangle.is_intersected(l1[0], l1[1], l1[2], l1[3], l2[0], l2[1], l2[2], l2[3]):
+                            # intersect
+                            return False
+                return True
         elif isinstance(other, MultiRectangle):
             # self is a standard rectangle and other are multiRectangles
             for r in other.rectangles:
@@ -93,11 +103,23 @@ class Rectangle(object):
     def GetCross(p1: Point, p2: Point, p: Point):
         return (p2.x - p1.x) * (p.y - p1.y) - (p.x - p1.x) * (p2.y - p1.y)
 
-    def is_intersected(self, other: 'Rectangle') -> bool:
-        lines = [[other.p1, other.p2], [other.p2, other.p3], [other.p3, other.p4], [other.p4, other.p1]]
-        for line in lines:
-
-
+    @staticmethod
+    def is_intersected(Ax1, Ay1, Ax2, Ay2, Bx1, By1, Bx2, By2) -> bool:
+        if (
+                (max(Ax1, Ax2) >= min(Bx1, Bx2) and min(Ax1, Ax2) <= max(Bx1, Bx2)) and
+                (max(Ay1, Ay2) >= min(By1, By2) and min(Ay1, Ay2) <= max(By1, By2))
+        ):
+            if (
+                    ((Bx1 - Ax1) * (Ay2 - Ay1) - (By1 - Ay1) * (Ax2 - Ax1)) *
+                    ((Bx2 - Ax1) * (Ay2 - Ay1) - (By2 - Ay1) * (Ax2 - Ax1)) <= 0 and
+                    ((Ax1 - Bx1) * (By2 - By1) - (Ay1 - By1) * (Bx2 - Bx1)) *
+                    ((Ax2 - Bx1) * (By2 - By1) - (Ay2 - By1) * (Bx2 - Bx1)) <= 0
+            ):
+                return True
+            else:
+                return False
+        else:
+            return False
 
 
 class MultiRectangle(object):
@@ -224,11 +246,14 @@ def main(argv):
             df_test.latitude = pd.to_numeric(df_test.latitude)
             test = df_test[['longitude', 'latitude']].to_numpy(dtype=float)
             # construct kd-Tree
+            index_start = time.time()
             kd_tree = KDTree(dataset, leaf_size=2)
+            print('t0:', time.time() - index_start)
             k_1 = df_test['k'].to_numpy()
             j = 0
             for i in k_1:
                 temp_test = test[j]
+                query_start = time.time()
                 distance, indices = kd_tree.query([temp_test], k=i, return_distance=True)
                 indices = indices[0]
                 id1 = []
@@ -249,6 +274,7 @@ def main(argv):
                                 temp = indices[id_index]
                                 indices[id_index] = indices[id_index + 1]
                                 indices[id_index + 1] = temp
+                print('t1:', time.time() - query_start)
                 j += 1
                 with open('outputs/task1_sample_results.txt', 'a', encoding='utf-8') as f:
                     for v in indices:
@@ -289,6 +315,7 @@ def main(argv):
                 temp_test_datetime_begin = df_test['datetime_begin'][j]
                 temp_test_datetime_end = df_test['datetime_end'][j]
                 drop_indices = []
+                index_start = time.time()
                 for id_index, v_id in enumerate(df_dataset['id']):
                     if df_dataset['datetime'][id_index] < temp_test_datetime_begin or \
                             df_dataset['datetime'][id_index] > temp_test_datetime_end:
@@ -299,6 +326,8 @@ def main(argv):
                 dataset = temp_dataset[['longitude', 'latitude']].to_numpy()
                 # construct kd-Tree
                 kd_tree = KDTree(temp_dataset, leaf_size=2)
+                print('t0:', time.time() - index_start)
+                query_start = time.time()
                 distance, indices = kd_tree.query([temp_test_coord], k=t, return_distance=True)
                 indices = indices[0]
                 id1 = []
@@ -319,6 +348,7 @@ def main(argv):
                                 temp = indices[id_index]
                                 indices[id_index] = indices[id_index + 1]
                                 indices[id_index + 1] = temp
+                print('t1:', time.time() - query_start)
                 with open('outputs/task2_sample_results.txt', 'a', encoding='utf-8') as f:
                     for v in indices:
                         f.write(str(v))
@@ -342,12 +372,13 @@ def main(argv):
             rect_all = Rectangle(x_min, y_min, x_max, y_max)
 
             # construct quadtree
+            index_start = time.time()
             q_tree = QuadTree(rect_all, [])
             for index, coord in enumerate(dataset):
                 attr = {'id': s_id[index]}
                 temp = Point(coord[0], coord[1], attr)
                 q_tree.insert(temp)
-
+            print('t0:', time.time() - index_start)
             j = 0
             for temp_coord1 in test_coord1:
                 temp_coord2 = test_coord2[j]
@@ -355,12 +386,14 @@ def main(argv):
                 x_max, y_max = np.max(window_coord, axis=0)
                 x_min, y_min = np.min(window_coord, axis=0)
                 rect_query = Rectangle(x_min, y_min, x_max, y_max)
+                query_start = time.time()
                 res = q_tree.window_query(rect_query)
                 res_id = []
                 for i in res:
                     res_id.append(i.attr['id'])
                 real_res = np.array(res_id)
                 real_res = np.sort(real_res)
+                print('t1:', time.time() - query_start)
                 j += 1
                 # write file
                 with open('outputs/task3_sample_results.txt', 'a', encoding='utf-8') as f:
@@ -404,11 +437,13 @@ def main(argv):
             x_min, y_min = np.min(dataset, axis=0)
             rect_all = Rectangle(x_min, y_min, x_max, y_max)
             # construct quadtree
+            index_start = time.time()
             q_tree = QuadTree(rect_all, [])
             for index, coord in enumerate(dataset):
                 attr = {'id': s_id[index]}
                 temp = Point(coord[0], coord[1], attr)
                 q_tree.insert(temp)
+            print('t0:', time.time() - index_start)
             j = 0
             for temp_coord1 in test_coord1:
                 temp_coord2 = test_coord2[j]
@@ -418,6 +453,7 @@ def main(argv):
                 x_max, y_max = np.max(window_coord, axis=0)
                 x_min, y_min = np.min(window_coord, axis=0)
                 rect_query = Rectangle(x_min, y_min, x_max, y_max)
+                query_start = time.time()
                 res = q_tree.window_query(rect_query)
                 res_id = []
                 for i in res:
@@ -430,6 +466,7 @@ def main(argv):
                     id_index = np.argwhere(s_id == i)[0]
                     if temp_test_datetime_begin <= df_dataset['datetime'][id_index[0]] <= temp_test_datetime_end:
                         real_datetime_res.append(i)
+                print('t1:', time.time() - query_start)
                 j += 1
                 # write file
                 with open('outputs/task4_sample_results.txt', 'a', encoding='utf-8') as f:
@@ -458,13 +495,13 @@ def main(argv):
             x_max, y_max = np.max(dataset, axis=0)
             x_min, y_min = np.min(dataset, axis=0)
             rect_all = Rectangle(x_min, y_min, x_max, y_max)
-
+            index_start = time.time()
             q_tree = QuadTree(rect_all, [])
             for index, coord in enumerate(dataset):
                 attr = {'id': s_id[index]}
                 temp = Point(coord[0], coord[1], attr)
                 q_tree.insert(temp)
-
+            print('t0:', time.time() - index_start)
             j = 0
             for d in dis:
                 temp_test_datetime_begin = df_test['datetime_begin'][j]
@@ -476,6 +513,7 @@ def main(argv):
                     p = Point(float(coord_group_str[i]), float(coord_group_str[i + 1]))
                     coord_group.append(p)
                 rect_query = MultiRectangle(coord_group, d)
+                query_start = time.time()
                 res = q_tree.window_query(rect_query)
                 res_id = []
                 for i in res:
@@ -488,6 +526,7 @@ def main(argv):
                     id_index = np.argwhere(s_id == i)[0]
                     if temp_test_datetime_begin <= df_dataset['datetime'][id_index[0]] <= temp_test_datetime_end:
                         real_datetime_res.append(i)
+                print('t1:', time.time() - query_start)
                 j += 1
                 # write file
                 with open('outputs/task5_sample_results.txt', 'a', encoding='utf-8') as f:
