@@ -122,15 +122,15 @@ class Rectangle(object):
             return False
 
 
-class MultiRectangle(object):
-    def __init__(self, points: list[Point], distance: float = 1) -> None:
+class MultiRectangle:
+    def __init__(self, points: list, distance: float = 1) -> None:
         self.rectangles = []
         if len(points) < 2:
             raise "input at least two points"
         temp_points1 = points[1:]
         for index in range(0, len(temp_points1)):
-            point1 = temp_points1[index]
-            point2 = points[index]
+            point1:Point = temp_points1[index]
+            point2:Point = points[index]
             if point1.x == point2.x:
                 # standard rectangle
                 y_min = min([point1.y, point2.y])
@@ -324,16 +324,19 @@ def main(argv):
                 if temp_dataset.empty:
                     continue
                 dataset = temp_dataset[['longitude', 'latitude']].to_numpy()
+                new_id = temp_dataset['id'].to_numpy()
                 # construct kd-Tree
-                kd_tree = KDTree(temp_dataset, leaf_size=2)
+                kd_tree = KDTree(dataset, leaf_size=2)
                 print('t0:', time.time() - index_start)
                 query_start = time.time()
                 distance, indices = kd_tree.query([temp_test_coord], k=t, return_distance=True)
+
                 indices = indices[0]
                 id1 = []
                 # change id_index to id
                 for i1 in indices:
-                    id1.append(df_dataset['id'][i1])
+                    id1.append(new_id[i1])
+                print(id1)
                 indices = np.array(id1, dtype=int)
                 distance = np.array(distance[0])
                 for d in distance:
