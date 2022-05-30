@@ -129,8 +129,8 @@ class MultiRectangle:
             raise "input at least two points"
         temp_points1 = points[1:]
         for index in range(0, len(temp_points1)):
-            point1:Point = temp_points1[index]
-            point2:Point = points[index]
+            point1: Point = temp_points1[index]
+            point2: Point = points[index]
             if point1.x == point2.x:
                 # standard rectangle
                 y_min = min([point1.y, point2.y])
@@ -330,7 +330,6 @@ def main(argv):
                 print('t0:', time.time() - index_start)
                 query_start = time.time()
                 distance, indices = kd_tree.query([temp_test_coord], k=t, return_distance=True)
-
                 indices = indices[0]
                 id1 = []
                 # change id_index to id
