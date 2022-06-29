@@ -276,7 +276,7 @@ def main(argv):
                                 indices[id_index + 1] = temp
                 print('t1:', time.time() - query_start)
                 j += 1
-                with open('outputs/task1_sample_results.txt', 'a', encoding='utf-8') as f:
+                with open('outputs/task1_results.txt', 'a', encoding='utf-8') as f:
                     for v in indices:
                         f.write(str(v))
                         f.write('\n')
@@ -351,7 +351,7 @@ def main(argv):
                                 indices[id_index] = indices[id_index + 1]
                                 indices[id_index + 1] = temp
                 print('t1:', time.time() - query_start)
-                with open('outputs/task2_sample_results.txt', 'a', encoding='utf-8') as f:
+                with open('outputs/task2_results.txt', 'a', encoding='utf-8') as f:
                     for v in indices:
                         f.write(str(v))
                         f.write('\n')
@@ -398,7 +398,7 @@ def main(argv):
                 print('t1:', time.time() - query_start)
                 j += 1
                 # write file
-                with open('outputs/task3_sample_results.txt', 'a', encoding='utf-8') as f:
+                with open('outputs/task3_results.txt', 'a', encoding='utf-8') as f:
                     for v in real_res:
                         f.write(str(v))
                         f.write('\n')
@@ -471,7 +471,7 @@ def main(argv):
                 print('t1:', time.time() - query_start)
                 j += 1
                 # write file
-                with open('outputs/task4_sample_results.txt', 'a', encoding='utf-8') as f:
+                with open('outputs/task4_results.txt', 'a', encoding='utf-8') as f:
                     for v in real_datetime_res:
                         f.write(str(v))
                         f.write('\n')
@@ -531,7 +531,7 @@ def main(argv):
                 print('t1:', time.time() - query_start)
                 j += 1
                 # write file
-                with open('outputs/task5_sample_results.txt', 'a', encoding='utf-8') as f:
+                with open('outputs/task5_results.txt', 'a', encoding='utf-8') as f:
                     for v in real_datetime_res:
                         f.write(str(v))
                         f.write('\n')
