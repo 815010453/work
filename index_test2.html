@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>amis admin</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <link rel="stylesheet" title="default" href="sdk.css" />
+  <link rel="stylesheet" href="helper.css" />
+  <link rel="stylesheet" href="iconfont.css" />
+  <script src="sdk.js"></script>
+  <script src="https://unpkg.com/vue@2"></script>
+  <script src="https://unpkg.com/history@4.10.1
+/umd/history.js"></script>
+  <style>
+    html,
+    body,
+    .app-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root" class="app-wrapper"></div>
+  <script>
+    (function () {
+      let amis = amisRequire('amis/embed');
+      // 配置前端界面的JSON
+      let amisJSON = {
+        "type": "page",
+        "style": {
+          // "backgroundImage": "image4.png",
+          "font-family": "楷体",
+          "font-weight": "bold"
+        },
+        "body": [
+          {
+            "type": "service",
+            "api": {
+              "method": "post",
+              "url": "http://localhost:7861/response",
+              "data": {
+                "query": "针对中国不断增长的人口数量，你能提出一些可持续的人口管理策略吗",
+                "history": []
+              },
+              //"sendOn": "${keywords!=null}",
+            },
+            "body": [
+              {
+                "type": "grid-2d",
+                "grids": [
+                  //搜索框 1,1,1,3
+                  {
+                    "x": 1,
+                    "y": 1,
+                    "h": 1,
+                    "w": 3,
+                    // "gridClassName": "bg-yellow-300",
+                    "type": "container",
+                    "body": [
+                      {
+                        "type": "search-box",
+                        "style": {
+                          "width": 600,
+                        },
+                        "name": "keyword",
+                        "clearable": true,
+                        "enhance": true,
+                        "value": "针对中国不断增长的人口数量，你能提出一些可持续的人口管理策略吗",
+                      },
+                    ]
+
+                  },
+                  //图表 x:7,y:9,h:5,w:4 
+                  {
+                    "x": 7,
+                    "y": 10,
+                    "h": 8,
+                    "w": 5,
+                    "valign": "middle",
+                    // "gridClassName": "bg-blue-200",
+                    "type": "chart",
+                    "api": {
+                      "method": "post",
+                      "url": "http://localhost:7861/bar",
+                      "data": {
+                        "query": "针对中国不断增长的人口数量，你能提出一些可持续的人口管理策略吗",//${keyword}
+                        "history": []//省略 目前没用
+                      }
+                    }
+
+                  },
+                  //地图 1,2,11,6
+                  {
+                    "x": 1,
+                    "y": 2,
+                    "h": 11,
+                    "w": 6,
+                    // "gridClassName": "bg-red-300",
+                    "type": "service",
+                    "style": {
+                      "backgroundColor": "transparent"
+                    },
+                    "body": {
+                      "type": "chart",
+                      "mapURL": {
+                        "method": "get",
+                        //"trackExpression": "${linedataset}",
+                        "url": "http://localhost:7861/map_geojson",
+                      },
+                      "mapName": "CHN",
+                      // "trackExpression": "${data}",
+                      "height": 800,
+                      "api": {
+                        "method": "post",
+                        "url": "http://localhost:7861/map",
+                        "data": {
+                          "query": "针对中国不断增长的人口数量，你能提出一些可持续的人口管理策略吗",//${keyword}
+                          "history": []//省略 目前没用
+                        }
+                      }
+                    }
+
+                  },
+                  //联想框 x:7,y:2,h:6,w:5 
+                  {
+                    "x": 7,
+                    "y": 2,
+                    "h": 6,
+                    "w": 5,
+                    // "gridClassName": "bg-green-300",
+                    "type": "container",
+                    "style": {
+                      "font-size": 15,
+                    },
+                    "body": [
+                      {
+                        "type": "tpl",
+                        "className": "overflow-scroll",
+                        "overflow": "scroll",
+                        "tpl": "<P>答复：</P><P>${response}</P>"
+                      }
+                    ],
+                    "actions": []
+                  }
+                ]
+              }
+            ]
+
+          }
+        ]
+
+
+
+      }
+
+      let amisScoped = amis.embed('#root', amisJSON);
+    })();
+  </script>
+</body>
+
+</html>

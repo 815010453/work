@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>amis admin</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="stylesheet" title="default" href="sdk.css" />
+    <link rel="stylesheet" href="helper.css" />
+    <link rel="stylesheet" href="iconfont.css" />
+    <script src="sdk.js"></script>
+    <script src="https://unpkg.com/vue@2"></script>
+    <script src="https://unpkg.com/history@4.10.1
+/umd/history.js"></script>
+    <style>
+        html,
+        body,
+        .app-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root" class="app-wrapper"></div>
+    <script>
+        // var Input =document.getElementById("problem");
+        (function () {
+            let amis = amisRequire('amis/embed');
+            // 配置前端界面的JSON
+
+            //描述型\诊断型\方案型\预测型
+            //是什么\为什么\怎么做\未来怎样
+            // question = ["根据最新的人口普查，中国的人口数量有多少",
+            //       "中国的庞大人口数量对其社会和经济发展有哪些影响",
+            //       "中国近几十年的人口数量变化趋势是怎样的",
+            //       "针对中国不断增长的人口数量，你能提出一些可持续的人口管理策略吗",
+            //       "未来几年内，你认为中国的人口数量会如何变化，你能预测并描述可能的人口趋势吗",
+            //       "四川省在近年来发生了哪些重大的地震",
+            //       "四川省曾经发生过哪些重大的山体滑坡事件",
+            //       "这些事件造成了什么样的影响，包括对人们的生活、环境和基础设施造成的影响",
+            //       "针对四川省地质灾害，特别是山体滑坡和地震，你能提出一些有效的预防和减轻灾害影响的策略和应对方案吗",
+            //       "未来五年内，四川省可能面临哪些潜在的地质灾害风险，特别是山体滑坡，你能预测这些风险的发生概率和可能的影响吗",
+            //       ]
+            let amisJSON = {
+                "type": "page",
+                "style": {
+                    "backgroundColor": "lightskyblue",
+                    "font-family": "楷体",
+                    "color": "black",
+                    "font-weight": "bold",
+                    "font-size": 15,
+                },
+                "body": [
+                    {
+                        "type": "grid-2d",
+                        "grids": [
+                            {
+                                "x": 1,
+                                "y": 2,
+                                "h": 11,
+                                "w": 6,
+                                "type": "chart",
+                                "id": "chart2",
+                                "name": "chart2",
+                                "className": "m-l-xxl bg-lightskyblue",
+                                "replaceChartOption": true,
+                                "mapURL": {
+                                    "method": "get",
+                                    "url": "http://localhost:7862/sichuan_map_geojson"
+                                },
+                                "mapName": "Sichuan",
+                                "height": 800,
+                                "api": {
+                                    "method": "post",
+                                    "url": "http://localhost:7862/sichuan_map",
+                                    "data": {
+                                        "query": "${year}"
+                                    }
+                                },
+                                "onEvent": {
+                                    "click": {
+                                        "actions": [
+                                            {
+                                                "actionType": "setValue",
+                                                "componentId": "form_data",
+                                                "args": {
+                                                    "value": {
+                                                        "text": "${event.data.name}"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "actionType": "setValue",
+                                                "componentId": "answer",
+                                                "args": {
+                                                    "value": "${event.data.value}"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "x": 7,
+                                "y": 2,
+                                "h": 3,
+                                "w": 2,
+                                "type": "form",
+                                "className": "m-t-xs",
+                                "height": 220,
+                                "width": 260,
+                                "wrapWithPanel": false,
+                                "submitOnInit": true,
+                                "submitOnChange": true,
+                                "body": [
+                                    {
+                                        "type": "group",
+                                        "body": [
+                                            {
+                                                "type": "form",
+                                                "target": "chart2",
+                                                "className": "m-r-xxl",
+                                                "wrapWithPanel": false,
+                                                "submitOnInit": true,
+                                                "submitOnChange": true,
+                                                "body": [
+                                                    {
+                                                        "name": "year",
+                                                        "type": "select",
+                                                        "label": "",
+                                                        "inline": true,
+                                                        "value": "2023",
+                                                        "options": [
+                                                            {
+                                                                "label": "2020",
+                                                                "value": "2020"
+                                                            },
+                                                            {
+                                                                "label": "2021",
+                                                                "value": "2021"
+                                                            },
+                                                            {
+                                                                "label": "2022",
+                                                                "value": "2022"
+                                                            },
+                                                            {
+                                                                "label": "2023",
+                                                                "value": "2023"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "type": "form",
+                                                "name": "form_graph",
+                                                "id": "form_data",
+                                                "className": "no-padder m-l-none",
+                                                "wrapWithPanel": false,
+                                                "data": {
+                                                    "file": "sichuan.json",
+                                                    "text": ""
+                                                },
+                                                "body": [
+                                                    {
+                                                        "type": "input-text",
+                                                        "style": {
+                                                            "width": 260
+                                                        },
+                                                        "name": "text",
+                                                        "placeholder": "请输入地区",
+                                                        "clearable": true,
+                                                        "disabled": false,
+                                                        "enhance": true,
+                                                        "addOn": {
+                                                            "type": "button",
+                                                            "label": "搜索",
+                                                            "level": "primary",
+                                                            "actionnType": "confirm",
+                                                            "onEvent": {
+                                                                "click": {
+                                                                    "actions": [
+                                                                        {
+                                                                            "actionType": "ajax",
+                                                                            "args": {
+                                                                                "api": {
+                                                                                    "method": "post",
+                                                                                    "url": "http://localhost:7862/graph_json",
+                                                                                    "data": {
+                                                                                        "input_file": "${file}",
+                                                                                        "query": "${text}"
+                                                                                    },
+                                                                                    "messages": {
+                                                                                        "success": "",
+                                                                                        "failed": "请求失败!"
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        },
+                                                                        {
+                                                                            "actionType": "setValue",
+                                                                            "componentId": "answer",
+                                                                            "args": {
+                                                                                "value": "${event.data.tpl}"
+
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            }
+                                                        },
+                                                        "options": [
+                                                            {
+                                                                "label": "四川省",
+                                                                "value": "四川省"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "group",
+                                        "body": [
+                                            {
+                                                "type": "form",
+                                                "target": "chart2",
+                                                "className": "no-padder m-r-none",
+                                                "wrapWithPanel": false,
+                                                "submitOnInit": true,
+                                                "submitOnChange": true,
+                                                "body": [
+                                                    {
+                                                        "name": "disaster",
+                                                        "className": "m-r-xxl",
+                                                        "type": "select",
+                                                        "label": "",
+                                                        "inline": true,
+                                                        "value": "地震",
+                                                        "options": [
+                                                            {
+                                                                "label": "地震",
+                                                                "value": "地震"
+                                                            },
+                                                            {
+                                                                "label": "泥石流",
+                                                                "value": "泥石流"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "type": "textarea",
+                                                // "static": true,
+                                                "style": {
+                                                    "width": 260,
+                                                    "height": 200,
+                                                    "overflow": "auto"
+                                                },
+                                                "id": "answer",
+                                                "label": "信息:",
+                                                "readOnly": true,
+                                                "name": "info"
+                                            }
+                                        ]
+                                    }
+
+                                ]
+                            },
+                            {
+                                "x": 7,
+                                "y": 10,
+                                "h": 4,
+                                "w": 5,
+                                "type": "page",
+                                "className": "m-l-xxl border-solid border-2 border-blue-500 rounded-xl shadow-lg",
+                                "body": {
+                                    "type": "carousel",
+                                    "auto": false,
+                                    "thumbMode": "contain",
+                                    "animation": "slide",
+                                    "auto": true,
+                                    "multiple": {
+                                        "count": 4
+                                    },
+                                    "interval": 3000,
+                                    "duration": 1000,
+                                    "height": 175,
+                                    "alwaysShowArrow": false,
+                                    "options": [
+                                        {
+                                            "image": "image/html1_1.png",
+                                            // "titleClassName":"hp_text",
+                                            "title": "各地区65岁以上人口占比分别",
+                                            "href": "http://finance.sina.com.cn/jjxw/2021-05-11/doc-ikmyaawc4730013.shtml"
+                                        },
+                                        {
+                                            "image": "image/html1_2.png",
+                                            "title": "第七次人口普查不同省份总人口",
+                                            "href": "https://www.cnblogs.com/chenlove/p/14801801.html"
+                                        },
+                                        {
+                                            "image": "image/html1_3.png",
+                                            "title": "新型冠状病毒肺炎疫情:中国(截止2020/2/27)",
+                                            "href": "http://tech.sina.com.cn/roll/2020-03-01/doc-iimxxstf5502992.shtml"
+                                        },
+                                        {
+                                            "image": "image/html1_4.png",
+                                            "title": "新型冠状病毒肺炎疫情:匈牙利(截止2020/5/10)",
+                                            "href": "http://news.sina.com.cn/w/2020-05-11/doc-iircuyvi2502467.shtml"
+                                        },
+                                        // {
+                                        //   "image": "html1_5.png",
+                                        //   "title":"各地区65岁以上人口占比分别",
+                                        //   "href": "https://aisuda.bce.baidu.com/amis/zh-CN/components/carousel"
+                                        // },
+                                        {
+                                            "image": "image/html1_6.jpg",
+                                            "title": "2021年各省GDP分布地图",
+                                            "href": "http://t.10jqka.com.cn/pid_219337807.shtml"
+                                        },
+                                    ]
+                                }
+                            },
+                            {
+                                "x": 9,
+                                "y": 2,
+                                "h": 2,
+                                "w": 2,
+                                "type": "form",
+                                "wrapWithPanel": false,
+                                "className": "m-l-xxl",
+                                "columnCount": 1,
+                                "body": [
+                                    {
+                                        "type": "tpl",
+                                        "tpl": "相关搜索>>",
+                                        "style": {
+                                            "font-weight": "bold",
+                                            "font-size": 18,
+                                            "color": "black"
+                                        },
+                                    },
+                                    {
+                                        "type": "link",
+                                        "style": {
+                                            "font-weight": "bold",
+                                            "font-size": 15,
+                                            "color": "blue",
+                                            "text-indent": 10
+                                        },
+                                        "icon": "fa fa-play",
+                                        "href": "https://yjt.sc.gov.cn/scyjt/fangzaijianzai/2021/2/9/b9a3a680e21846148a26bda79a4d08b8.shtml#:~:text=2020%E5%B9%B4%E6%88%91%E7%9C%81%E6%B4%AA,%E5%A2%9E%E5%8A%A0149%25%EF%BC%89%E3%80%82",
+                                        "body": "2020年四川省自然灾害基本情况"
+                                    },
+                                    {
+                                        "type": "link",
+                                        "style": {
+                                            "font-weight": "bold",
+                                            "font-size": 15,
+                                            "text-indent": 10,
+                                            "color": "blue"
+                                        },
+                                        "icon": "fa fa-play",
+                                        "href": "https://yjt.sc.gov.cn/scyjt/juecegongkai/2022/3/3/6d03f936612249958b95bdb0671cfd6e.shtml",
+                                        "body": "2021年四川省自然灾害基本情况"
+                                    },
+                                    {
+                                        "type": "link",
+                                        "style": {
+                                            "font-weight": "bold",
+                                            "font-size": 15,
+                                            "text-indent": 10,
+                                            "color": "blue"
+                                        },
+                                        "icon": "fa fa-play",
+                                        "href": "https://yjt.sc.gov.cn/scyjt/juecegongkai/2022/3/3/6d03f936612249958b95bdb0671cfd6e.shtml",
+                                        "body": "2022年四川省自然灾害基本情况"
+                                    },
+                                    {
+                                        "type": "link",
+                                        "style": {
+                                            "font-weight": "bold",
+                                            "font-size": 15,
+                                            "text-indent": 10,
+                                            "color": "blue"
+                                        },
+                                        "icon": "fa fa-play",
+                                        "href": "https://www.mem.gov.cn/xw/yjglbgzdt/202307/t20230707_455762.shtml",
+                                        "body": "2023年四川省自然灾害基本情况"
+                                    },
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+
+            let amisScoped = amis.embed('#root', amisJSON);
+        })();
+    </script>
+</body>
+
+</html>

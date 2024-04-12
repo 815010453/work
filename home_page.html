@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>amis admin</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <link rel="stylesheet" title="default" href="sdk.css" />
+  <link rel="stylesheet" href="helper.css" />
+  <link rel="stylesheet" href="iconfont.css" />
+  <script src="sdk.js"></script>
+  <script src="https://unpkg.zhimg.com/vue@2"></script>
+
+  <style>
+    html,
+    body,
+    .app-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root" class="app-wrapper"></div>
+  <script>
+    // var Input =document.getElementById("problem");
+    (function () {
+      let amis = amisRequire('amis/embed');
+      // 配置前端界面的JSON
+
+      //描述型\诊断型\方案型\预测型
+      //是什么\为什么\怎么做\未来怎样
+      // question = ["根据最新的人口普查，中国的人口数量有多少",
+      //       "中国的庞大人口数量对其社会和经济发展有哪些影响",
+      //       "中国近几十年的人口数量变化趋势是怎样的",
+      //       "针对中国不断增长的人口数量，你能提出一些可持续的人口管理策略吗",
+      //       "未来几年内，你认为中国的人口数量会如何变化，你能预测并描述可能的人口趋势吗",
+      //       "四川省在近年来发生了哪些重大的地震",
+      //       "四川省曾经发生过哪些重大的山体滑坡事件",
+      //       "这些事件造成了什么样的影响，包括对人们的生活、环境和基础设施造成的影响",
+      //       "针对四川省地质灾害，特别是山体滑坡和地震，你能提出一些有效的预防和减轻灾害影响的策略和应对方案吗",
+      //       "未来五年内，四川省可能面临哪些潜在的地质灾害风险，特别是山体滑坡，你能预测这些风险的发生概率和可能的影响吗",
+      //       ]
+      let amisJSON = {
+        "type": "page",
+        "style": {
+          "backgroundImage": "image/html1.jpg",
+          "backgroundSize": "cover",
+          "font-family": "楷体",
+          "font-weight": "bold"
+        },
+        "body": [
+          {
+            "type": "grid-2d",
+            "grids": [
+              //名字
+              {
+                "x": 4,
+                "y": 5,
+                "h": 2,
+                "w": 5,
+                "type": "container",
+                "valign": "bottom",
+                "align": "center",
+                "className": "m-l-xxl",
+                "style": {
+                  "font-size": 45,
+                  "font-weight": 900,
+                  "background-image": "-webkit-linear-gradient(bottom, #74787c, #130c0e, black)",
+                  "-webkit-background-clip": "text",
+                  "-webkit-text-fill-color": "transparent",
+                },
+                "body": [
+                  {
+                    "type": "tpl",
+                    "tpl": "群智时空知识图谱问答系统"
+                  }
+                ]
+              },
+              //搜索框 4,7,1,5
+              {
+                "x": 4,
+                "y": 7,
+                "h": 1,
+                "w": 5,
+                "type": "input-group",
+                "name": "input-group",
+                "className": "m-l-xxl",
+                "body": [
+                  {
+                    "type": "select",
+                    "name": "search",
+                    "options": [
+                      {
+                        "label": "模糊搜索",
+                        "value": "模糊搜索"
+                      },
+                      {
+                        "label": "精确搜索",
+                        "value": "精确搜索"
+                      },
+                    ],
+                    "value": "模糊搜索"
+                  },
+                  {
+                    "type": "input-text",
+                    "name": "keywords",
+                    "placeholder": "请输入问题",
+                    "mode": "horizontal",
+                    "clearable": true,
+                    "enhance": true,
+                    // "multiple": true,
+                    "inputClassName": "b-r-none p-r-none",
+                    "options": [
+                      {
+                        "label": "根据最新的人口普查，中国的人口数量有多少",
+                        "value": "根据最新的人口普查，中国的人口数量有多少"
+                      },
+                      {
+                        "label": "中国的庞大人口数量对其社会和经济发展有哪些影响",
+                        "value": "中国的庞大人口数量对其社会和经济发展有哪些影响"
+                      },
+                      {
+                        "label": "中国近几十年的人口数量变化趋势是怎样的",
+                        "value": "中国近几十年的人口数量变化趋势是怎样的"
+                      },
+                      {
+                        "label": "针对中国不断增长的人口数量，你能提出一些可持续的人口管理策略吗",
+                        "value": "针对中国不断增长的人口数量，你能提出一些可持续的人口管理策略吗"
+                      },
+                      {
+                        "label": "未来几年内，你认为中国的人口数量会如何变化，你能预测并描述可能的人口趋势吗",
+                        "value": "未来几年内，你认为中国的人口数量会如何变化，你能预测并描述可能的人口趋势吗"
+                      },
+                      {
+                        "label": "四川省在近年来发生了哪些重大的地震",
+                        "value": "四川省在近年来发生了哪些重大的地震"
+                      },
+                      {
+                        "label": "四川省曾经发生过哪些重大的山体滑坡事件",
+                        "value": "四川省曾经发生过哪些重大的山体滑坡事件"
+                      },
+                      {
+                        "label": "这些事件造成了什么样的影响，包括对人们的生活、环境和基础设施造成的影响",
+                        "value": "这些事件造成了什么样的影响，包括对人们的生活、环境和基础设施造成的影响"
+                      },
+                      {
+                        "label": "针对四川省地质灾害，特别是山体滑坡和地震，你能提出一些有效的预防和减轻灾害影响的策略和应对方案吗",
+                        "value": "针对四川省地质灾害，特别是山体滑坡和地震，你能提出一些有效的预防和减轻灾害影响的策略和应对方案吗"
+                      },
+                      {
+                        "label": "未来五年内，四川省可能面临哪些潜在的地质灾害风险，特别是山体滑坡，你能预测这些风险的发生概率和可能的影响吗",
+                        "value": "未来五年内，四川省可能面临哪些潜在的地质灾害风险，特别是山体滑坡，你能预测这些风险的发生概率和可能的影响吗"
+                      }
+                    ],
+                  },
+                  {
+                    "type": "button",
+                    "label": "搜索",
+                    "level": "primary",
+                    // "level": "success",
+                    "actionType": "url",
+                    "url": "http://127.0.0.1:5501/index_test2_1.html"
+                  }
+                ]
+              },
+              //下装饰
+              {
+                "x": 6,
+                "y": 8,
+                "h": 1,
+                "w": 2,
+                // "gridClassName": "bg-blue-200",
+                "type": "input-group",
+                "name": "input-group",
+                "body": [
+                  {
+                    "type": "image",
+                    "className": "b",
+                    "src": "image/AI-2.png",
+                    "innerClassName": "border-none",
+                    // "imageMode": "original",
+                    "height": "auto",
+                    "width": 20,
+                    // "align": "center",
+                    // "valign": "middle"
+                  },
+                  {
+                    "type": "link",
+                    "className": "m-t-xs",
+                    "style": {
+                      "color": "black",
+                      "font-weight": "bold",
+                      "font-size": 15,
+                    },
+                    "href": "https://openai.com/blog/chatgpt",
+                    "body": "体验AI伙伴新能力>>",
+
+                  }
+                ]
+              },
+              //轮播图
+              {
+                "x": 3,
+                "y": 12,
+                "h": 4,
+                "w": 8,
+                "type": "page",
+                "className": "border-solid border-2 border-blue-500 rounded-xl shadow-lg",
+                "body": {
+                  "type": "carousel",
+                  "auto": false,
+                  "thumbMode": "contain",
+                  "animation": "slide",
+                  "auto": true,
+                  "multiple": {
+                    "count": 4
+                  },
+                  "interval": 3000,
+                  "duration": 1000,
+                  "height": 175,
+                  "alwaysShowArrow": false,
+                  "options": [
+                    {
+                      "image": "image/html1_1.png",
+                      // "titleClassName":"hp_text",
+                      "title": "各地区65岁以上人口占比分别",
+                      "href": "http://finance.sina.com.cn/jjxw/2021-05-11/doc-ikmyaawc4730013.shtml"
+                    },
+                    {
+                      "image": "image/html1_2.png",
+                      "title": "第七次人口普查不同省份总人口",
+                      "href": "https://www.cnblogs.com/chenlove/p/14801801.html"
+                    },
+                    {
+                      "image": "image/html1_3.png",
+                      "title": "新型冠状病毒肺炎疫情:中国(截止2020/2/27)",
+                      "href": "http://tech.sina.com.cn/roll/2020-03-01/doc-iimxxstf5502992.shtml"
+                    },
+                    {
+                      "image": "image/html1_4.png",
+                      "title": "新型冠状病毒肺炎疫情:匈牙利(截止2020/5/10)",
+                      "href": "http://news.sina.com.cn/w/2020-05-11/doc-iircuyvi2502467.shtml"
+                    },
+                    // {
+                    //   "image": "html1_5.png",
+                    //   "title":"各地区65岁以上人口占比分别",
+                    //   "href": "https://aisuda.bce.baidu.com/amis/zh-CN/components/carousel"
+                    // },
+                    {
+                      "image": "image/html1_6.jpg",
+                      "title": "2021年各省GDP分布地图",
+                      "href": "http://t.10jqka.com.cn/pid_219337807.shtml"
+                    },
+                  ]
+                }
+              },
+              //工具栏
+              {
+                "x": 2,
+                "y": 1,
+                "h": 1,
+                "w": 5,
+                "type": "input-group",
+                // "gridClassName": "bg-yellow-300"
+                "body": [
+                  {
+                    "type": "avatar",
+                    "src": "image/Avatar.png",
+                  },
+                  {
+                    "type": "link",
+                    // "className": "m-l-lg",
+                    "className": "m-t-sm",
+                    "style": {
+                      "color": "black",
+                      "font-weight": "bold",
+                      "font-size": 15,
+                      "font-family": "宋体",
+                    },
+                    "href": "https://www.baidu.com",
+                    "body": "ScaleLab",
+                  },
+                  {
+                    "type": "link",
+                    "className": "m-t-sm m-l-lg",
+                    "style": {
+                      "color": "black",
+                      "font-weight": "bold",
+                      "font-size": 15,
+                      "font-family": "宋体",
+                    },
+                    "href": "https://www.amap.com/",
+                    "body": "地图",
+                  }
+                ]
+              },
+              //工具栏
+              {
+                "x": 7,
+                "y": 1,
+                "h": 1,
+                "w": 5,
+                "type": "button-toolbar",
+                // "gridClassName": "bg-yellow-300",
+                "wrapWithPanel": false,
+                "style": {
+                  "backgroundColor": "transparent",
+                },
+                "align": "right",
+                "body": [
+                  {
+                    "type": "button",
+                    "className": "m-t-xs",
+                    // "align": "right",
+                    "style": {
+                      "color": "black",
+                      "font-weight": "bold",
+                      "font-size": 15,
+                      "font-family": "宋体",
+                    },
+                    "label": "登录",
+                    "level": "link",
+                    "actionType": "dialog",
+                    "dialog": {
+                      // "size": "lg",
+                      "title": "登录",
+                      "closeOnEsc": true,
+                      "actions": [
+                        {
+                          "type": "button",
+                          "actionType": "dialog",
+                          "label": "注册",
+                          "level": "primary",
+                          "dialog": {
+                            "title": "注册",
+                            "closeOnEsc": true,
+                            "actions": [
+                              {
+                                "label": "提交关闭",
+                                // "actionType": "submit",
+                                "close": true,
+                                "type": "button",
+                                // "api": "/amis/api/mock2/form/saveForm?waitSeconds=2",
+                                "level": "primary"
+                              },
+                              // {
+                              //   "label": "保存不关闭",
+                              //   "actionType": "ajax",
+                              //   "type": "button",
+                              //   "api": "/amis/api/mock2/form/saveForm?waitSeconds=4",
+                              //   "level": "info"
+                              // }
+                            ],
+                            "body": {
+                              "type": "form",
+                              "api": "/amis/api/mock2/form/saveForm?waitSeconds=2",
+                              "title": "常规模式",
+                              "mode": "normal",
+                              "body": [
+                                {
+                                  "type": "input-email",
+                                  "name": "email",
+                                  "required": true,
+                                  "placeholder": "请输入账号/邮箱",
+                                  "label": "账号/邮箱"
+                                },
+                                {
+                                  "type": "input-password",
+                                  "name": "password",
+                                  "label": "密码",
+                                  "required": true,
+                                  "placeholder": "请输入密码"
+                                }
+                              ]
+                            }
+                          }
+                        },
+                        // {
+                        //   "label": "确认",
+                        //   "actionType": "confirm",
+                        //   "type": "button",
+                        //   "level": "primary"
+                        // },
+                        // // {
+                        //   "label": "提交不关闭",
+                        //   "actionType": "submit",
+                        //   "close": false,
+                        //   "type": "button",
+                        //   "api": "/amis/api/mock2/form/saveForm?waitSeconds=2",
+                        //   "level": "primary"
+                        // },
+                        {
+                          "label": "提交关闭",
+                          // "actionType": "ajax",
+                          "type": "button",
+                          "close": true,
+                          // "api": "/amis/api/mock2/form/saveForm?waitSeconds=4",
+                          "level": "primary"
+                        },
+                        // {
+                        //   "type": "button",
+                        //   "label": "Feedback",
+                        //   "close": true,
+                        //   "actionType": "ajax",
+                        //   "api": "/amis/api/mock2/form/initData?waitSeconds=2",
+                        //   "tooltip": "点击我后会发送一个请求，请求回来后，弹出一个框。",
+                        //   "feedback": {
+                        //     "title": "操作成功",
+                        //     "body": "xxx 已操作成功"
+                        //   }
+                        // }
+                      ],
+                      "body": {
+                        "type": "form",
+                        "api": "/amis/api/mock2/form/saveForm?waitSeconds=2",
+                        "title": "常规模式",
+                        "mode": "normal",
+                        "body": [
+                          {
+                            "type": "input-email",
+                            "name": "email",
+                            "required": true,
+                            "placeholder": "请输入账号/邮箱",
+                            "label": "账号/邮箱"
+                          },
+                          {
+                            "type": "input-password",
+                            "name": "password",
+                            "label": "密码",
+                            "required": true,
+                            "placeholder": "请输入密码"
+                          },
+                          {
+                            "type": "checkbox",
+                            "name": "rememberMe",
+                            "label": "记住登录"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "dropdown-button",
+                    "label": "设置",
+                    "className": "m-t-xs m-l",
+                    "style": {
+                      "color": "black",
+                      "font-weight": "bold",
+                      "font-size": 15,
+                      "font-family": "宋体",
+                    },
+                    // "trigger": "hover",
+                    "closeOnClick": true,
+                    "rightIcon": "fa fa-ellipsis-v",
+                    "level": "sattic-link",
+                    "hideCaret": true,
+                    "buttons": [
+                      {
+                        "type": "button",
+                        "label": "按钮1",
+                      },
+                      {
+                        "type": "button",
+                        "label": "按钮2"
+                      },
+                      {
+                        "type": "button",
+                        "label": "按钮3"
+                      }
+                    ]
+                  },
+                ]
+              }
+            ]
+          }
+        ]
+      }
+
+      let amisScoped = amis.embed('#root', amisJSON);
+    })();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>amis admin</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="stylesheet" title="default" href="sdk.css" />
+    <link rel="stylesheet" href="helper.css" />
+    <link rel="stylesheet" href="iconfont.css" />
+    <script src="sdk.js"></script>
+    <script src="https://unpkg.zhimg.com/vue@2"></script>
+
+    <style>
+        html,
+        body,
+        .app-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root" class="app-wrapper"></div>
+    <script>
+        (function () {
+            let amis = amisRequire('amis/embed');
+            // 配置前端界面的JSON
+            let amisJSON = {
+                "type": "page",
+                "body": [
+                    {
+                        "type": "form",
+                        "style": {
+                            "font-weight": 900,
+                            "font-size": 40,
+                            "font-family": "宋体",
+                        },
+                        "debug": true,
+                        "mode": "inline",
+                        "name": "Model_builder",
+                        "title": "Model builder",
+                        "target": "tool1,graph1,graph2",
+                        // "panelClassName": "Panel--info",
+                        "data": {
+                            "form_data": {
+                                "input_file2": "",
+                                "output_file2": "",
+                                "input_file3": "",
+                                "output_file3": "",
+                                "input_file4": "",
+                                "output_file4": "",
+                                "input_file6": ""
+                            }
+                        },
+                        "body": [
+                            {
+                                "type": "group",
+                                "className": "m-l-md",
+                                "body": [
+                                    {
+                                        "name": "function1",
+                                        "type": "select",
+                                        "label": "知识提取",
+                                        "inline": true,
+                                        "value": "initial.json",
+                                        "options": [
+                                            {
+                                                "label": "1",
+                                                "value": "k_extric_1.json"
+                                            },
+                                            {
+                                                "label": "2",
+                                                "value": "k_extric_2.json"
+                                            },
+                                            {
+                                                "label": "0",
+                                                "value": "initial.json"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "function2",
+                                        "type": "select",
+                                        "label": "格式转换",
+                                        "inline": true,
+                                        "value": "initial.json",
+                                        "options": [
+                                            {
+                                                "label": "1",
+                                                "value": "csvTojson_1.json"
+                                            },
+                                            {
+                                                "label": "2",
+                                                "value": "csvTojson_2.json"
+                                            },
+                                            {
+                                                "label": "0",
+                                                "value": "initial.json"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "function3",
+                                        "type": "select",
+                                        "label": "图谱构建",
+                                        "inline": true,
+                                        "value": "initial.json",
+                                        "options": [
+                                            {
+                                                "label": "1",
+                                                "value": "graph_build_1.1.json"
+                                            },
+                                            {
+                                                "label": "2",
+                                                "value": "graph_build_2.1.json"
+                                            },
+                                            {
+                                                "label": "0",
+                                                "value": "initial.json"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "name": "function4",
+                                        "type": "select",
+                                        "label": "图谱更新",
+                                        "inline": true,
+                                        "value": "initial.json",
+                                        "options": [
+                                            {
+                                                "label": "1",
+                                                "value": "graph_build.json"
+                                            },
+                                            {
+                                                "label": "2",
+                                                "value": "graph_build_1.json"
+                                            },
+                                            {
+                                                "label": "0",
+                                                "value": "initial.json"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "divider"
+                            },
+                            {
+                                "type": "group",
+                                "body": [
+                                    {
+                                        "type": "service",
+                                        "className": "m-t",
+                                        "schemaApi": "get:pages/${function1}"
+                                    },
+                                    {
+                                        "type": "service",
+                                        "className": "m-t",
+                                        "schemaApi": "get:pages/${function2}"
+                                    },
+                                    {
+                                        "type": "service",
+                                        "className": "m-t",
+                                        "schemaApi": "get:pages/${function3}"
+                                    },
+                                    {
+                                        "type": "container",
+                                        "body": {}
+                                    }
+                                ]
+                            }
+
+                        ],
+                        "actions": [
+                            {
+                                "type": "submit",
+                                "label": "运行",
+                                "level": "primary",
+                            },
+                            {
+                                "type": "button",
+                                "label": "刷新",
+                                "level": "primary",
+                                "onEvent": {
+                                    "click": {
+                                        "actions": [
+                                            {
+                                                "actionType": "refresh"
+                                            }
+                                        ]
+                                    }
+                                }
+
+                            }
+                        ]
+                    },
+                    {
+                        "type": "grid-2d",
+                        "grids": [
+                            {
+                                "x": 1,
+                                "y": 1,
+                                "h": 1,
+                                "w": 9,
+                                "type": "service",
+                                "name": "tool1",
+                                "api": {
+                                    "method": "post",
+                                    "url": "http://localhost:7861/csv_To_json",
+                                    "data": {
+                                        "input_file": "${form_data.input_file4.path}",
+                                        "output_file": "${form_data.output_file4}"
+                                    }
+                                }
+                            },
+                            {
+                                "x": 1,
+                                "y": 1,
+                                "h": 1,
+                                "w": 9,
+                                "type": "chart",
+                                "name": "graph1",
+                                "className": "m-l-xxl m-r-xxl",
+                                "replaceChartOption": true,
+                                "height": 480,
+                                "api": {
+                                    "method": "post",
+                                    "url": "http://localhost:7861/graph",
+                                    "data": {
+                                        "query": "${form_data.input_file5.path}"
+                                    }
+                                }
+                            },
+                            {
+                                "x": 1,
+                                "y": 1,
+                                "h": 1,
+                                "w": 9,
+                                "type": "chart",
+                                "name": "graph2",
+                                "replaceChartOption": true,
+                                "className": "m-l-xxl m-r-xxl",
+                                "height": 480,
+                                "api": {
+                                    "method": "post",
+                                    "url": "http://localhost:7861/graph",
+                                    "data": {
+                                        "query": "${form_data.input_file6}" + ".json"
+                                    }
+                                }
+                            },
+                            {
+                                "x": 10,
+                                "y": 1,
+                                "h": 1,
+                                "w": 2,
+                                "type": "form",
+                                "wrapWithPanel": false,
+                                "body": [
+                                    {
+                                        "type": "input-text",
+                                        "name": "keyword",
+                                        "placeholder": "请输入问题",
+                                        "value": "中华人民共和国",
+                                        "clearable": true,
+                                        "enhance": true,
+                                        "addOn": {
+                                            "type": "submit",
+                                            "label": "搜索",
+                                            "level": "primary"
+                                        },
+                                        "options": [
+                                            {
+                                                "label": "四川省编码",
+                                                "value": "四川省编码"
+                                            },
+                                            {
+                                                "label": "江苏省经度",
+                                                "value": "江苏省经度"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "textarea",
+                                        "label": "回答",
+                                        "value": "节点名称：中华人民共和国               描述：中华人民共和国（the People's Republic of China），简称“中国”，成立于1949年10月1日，位于亚洲东部，太平洋西岸。                                    关系最近节点：编码、经度、纬度"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+
+
+            }
+
+            let amisScoped = amis.embed('#root', amisJSON);
+        })();
+    </script>
+</body>
+
+</html>

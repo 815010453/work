@@ -1,0 +1,84 @@
+
+
+
+
+  <!DOCTYPE html>
+<html>
+
+<head>
+  <title>AMIS Drag and Drop</title>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <link rel="stylesheet" title="default" href="sdk.css" />
+  <link rel="stylesheet" href="helper.css" />
+  <link rel="stylesheet" href="iconfont.css" />
+  <script src="sdk.js"></script>
+  <script src="https://unpkg.com/vue@2"></script>
+  <script src="https://unpkg.com/history@4.10.1
+/umd/history.js"></script>
+  <style>
+    html,
+    body,
+    .app-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="amis-container" class="app-wrapper"></div>
+  <script>
+    (function () {
+      let amis = amisRequire('amis/embed');
+      // 配置前端界面的JSON
+
+      const amisConfig = {
+        "type": "page",
+        "body": [
+          {
+            "type": "panel",
+            // "draggable": true,
+            "className": "page-body",
+            "body": [
+              {
+                type: "container",
+                "draggable": true,
+                "body": {
+                  "type": "button",
+                  // "draggable": true,
+                  "label": "Click Me",
+                  "level": "primary",
+                  "actionType": "dialog",
+                  "onClick": "alert('Button Clicked!');"
+                }
+              }
+            ]
+          },
+          {
+            "type": "panel",
+            "className": "draggable-container",
+            "body": [
+              {
+                type: "container",
+                "draggable": true,
+                "body": [],
+                "onDragOver": "event.preventDefault();",
+                "onDrop": "var component = {\"type\": \"button\", \"label\": \"New Button\", \"level\": \"default\", \"actionType\": \"dialog\", \"onClick\": \"alert('New Button Clicked!');\"}; var newButton = amis.render(component, document.createElement('div')); event.target.appendChild(newButton);"
+              }
+            ]
+
+          }
+        ]
+      }
+      let amisScoped = amis.embed('#amis-container', amisConfig);
+    })();
+  </script>
+</body>
+
+</html>

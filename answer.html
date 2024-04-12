@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>amis admin</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <link rel="stylesheet" title="default" href="sdk.css" />
+  <link rel="stylesheet" href="helper.css" />
+  <link rel="stylesheet" href="iconfont.css" />
+  <script src="sdk.js"></script>
+  <script src="https://unpkg.com/vue@2"></script>
+  <script src="https://unpkg.com/history@4.10.1
+/umd/history.js"></script>
+  <style>
+    html,
+    body,
+    .app-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root" class="app-wrapper">
+  </div>
+  <script>
+    (function () {
+      let amis = amisRequire('amis/embed');
+      // 配置前端界面的JSON
+      let amisJSON = {
+        "type": "page",
+        "style": {
+          // "backgroundImage": "html2.jpg",
+          "font-family": "楷体",
+          "font-weight": "bold"
+        },
+        "body": [
+          {
+            "type": "form",
+            "target": "chart1,chart2,text",
+            "submitOnInit": true,
+            "className": "m-l-xxl m-t-md",
+            "wrapWithPanel": false,
+            // "mode": "inline",
+            "body": [
+              //搜索框
+              {
+                "type": "input-text",
+                "name": "keyword",
+                "placeholder": "请输入问题",
+                // "value": "四川省在近年来发生了哪些重大的地震",
+                "style": {
+                  "width": 600,
+                },
+                "clearable": true,
+                "enhance": true,
+                // "multiple": true,
+                "addOn": {
+                  "type": "button",
+                  "label": "搜索",
+                  "reload": "chart2",
+                  "level": "primary",
+                  "actionType": "confirm"
+                },
+                "options": [
+                  {
+                    "label": "根据最新的人口普查，中国的人口数量有多少",
+                    "value": "根据最新的人口普查，中国的人口数量有多少"
+                  },
+                  {
+                    "label": "中国的庞大人口数量对其社会和经济发展有哪些影响",
+                    "value": "中国的庞大人口数量对其社会和经济发展有哪些影响"
+                  },
+                  {
+                    "label": "中国近几十年的人口数量变化趋势是怎样的",
+                    "value": "中国近几十年的人口数量变化趋势是怎样的"
+                  },
+                  {
+                    "label": "针对中国不断增长的人口数量，你能提出一些可持续的人口管理策略吗",
+                    "value": "针对中国不断增长的人口数量，你能提出一些可持续的人口管理策略吗"
+                  },
+                  {
+                    "label": "未来几年内，你认为中国的人口数量会如何变化，你能预测并描述可能的人口趋势吗",
+                    "value": "未来几年内，你认为中国的人口数量会如何变化，你能预测并描述可能的人口趋势吗"
+                  },
+                  {
+                    "label": "四川省在近年来发生了哪些重大的地震",
+                    "value": "四川省在近年来发生了哪些重大的地震",
+                  },
+                  {
+                    "label": "四川省曾经发生过哪些重大的山体滑坡事件",
+                    "value": "四川省曾经发生过哪些重大的山体滑坡事件"
+                  },
+                  {
+                    "label": "这些事件造成了什么样的影响，包括对人们的生活、环境和基础设施造成的影响",
+                    "value": "这些事件造成了什么样的影响，包括对人们的生活、环境和基础设施造成的影响"
+                  },
+                  {
+                    "label": "针对四川省地质灾害，特别是山体滑坡和地震，你能提出一些有效的预防和减轻灾害影响的策略和应对方案吗",
+                    "value": "针对四川省地质灾害，特别是山体滑坡和地震，你能提出一些有效的预防和减轻灾害影响的策略和应对方案吗"
+                  },
+                  {
+                    "label": "未来五年内，四川省可能面临哪些潜在的地质灾害风险，特别是山体滑坡，你能预测这些风险的发生概率和可能的影响吗",
+                    "value": "未来五年内，四川省可能面临哪些潜在的地质灾害风险，特别是山体滑坡，你能预测这些风险的发生概率和可能的影响吗"
+                  }
+                ],
+              }
+            ]
+          },
+          {
+            "type": "grid-2d",
+            "grids": [
+              //图表
+              {
+                "x": 1,
+                "y": 6,
+                "h": 10,
+                "w": 6,
+                "valign": "middle",
+                "className": "m-l-xxl",
+                // "gridClassName": "bg-blue-200",
+                "type": "chart",
+                "name": "chart1",
+                "replaceChartOption": true,
+                "api": {
+                  "method": "post",
+                  "url": "http://localhost:7861/bar",
+                  "data": {
+                    "query": "${keyword}",//${keyword}
+                    "history": []
+                  }
+                }
+
+              },
+              //地图 
+              {
+                "x": 7,
+                "y": 1,
+                "h": 12,
+                "w": 7,
+                "type": "chart",
+                "id": "chart2",
+                "name": "chart2",
+                "className": "m-l-xxl m-r-xxl",
+                "replaceChartOption": true,
+                "mapURL": {
+                  "method": "get",
+                  "url": "http://localhost:7861/map_geojson",
+                },
+                "mapName": "CHN",
+                "height": 750,
+                "api": {
+                  "method": "post",
+                  "url": "http://localhost:7861/map",
+                  "data": {
+                    "query": "${keyword}",//${keyword}
+                    "history": []
+                  }
+                }
+              },
+              //答复框  
+              {
+                "x": 1,
+                "y": 1,
+                "h": 2,
+                "w": 6,
+                // "gridClassName": "bg-green-300",
+                "type": "service",
+                "name": "text",
+                "className": "m-t-none",
+                "api": {
+                  "method": "post",
+                  "url": "http://localhost:7861/response",
+                  "data": {
+                    "query": "${keyword}",
+                    "history": []
+                  },
+                },
+                "className": "m-l-xxl text-xl m-t m-r-xl",
+                "height": 150,
+                "style": {
+                  "height": 400,
+                  "overflow": "auto",
+                  // "text-indent": 20,
+                  "white-space": "pre-wrap"
+                },
+                "body": [
+                  {
+                    "type": "tpl",
+                    "tpl": "<P>${response}</P>"
+                  }
+                ]
+              }
+            ]
+          }
+
+        ]
+
+
+      }
+
+      let amisScoped = amis.embed('#root', amisJSON);
+    })();
+  </script>
+</body>
+
+</html>

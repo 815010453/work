@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>amis demo</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="stylesheet" href="sdk.css" />
+    <link rel="stylesheet" href="helper.css" />
+    <link rel="stylesheet" href="iconfont.css" />
+    <script src="https://unpkg.zhimg.com/vue@2"></script>
+
+    <!-- 这是默认主题所需的，如果是其他主题则不需要 -->
+    <!-- 从 1.1.0 开始 sdk.css 将不支持 IE 11，如果要支持 IE11 请引用这个 css，并把前面那个删了 -->
+    <!-- <link rel="stylesheet" href="sdk-ie11.css" /> -->
+    <!-- 不过 amis 开发团队几乎没测试过 IE 11 下的效果，所以可能有细节功能用不了，如果发现请报 issue -->
+    <style>
+        html,
+        body,
+        .app-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root" class="app-wrapper"></div>
+    <script src="sdk.js"></script>
+    <script type="text/javascript">
+        (function () {
+            let amis = amisRequire('amis/embed');
+            // 配置前端界面的JSON
+            let amisJSON = {
+                "type": "page",
+                "style": {
+                    "backgroundImage": "image/login3.jpg",
+                    "backgroundSize": "cover",
+                    "font-weight": "bold"
+                },
+                "body": [
+                    {
+                        "type": "grid-2d",
+                        "grids": [
+                            {
+                                "x": 2,
+                                "y": 1,
+                                "h": 1,
+                                "w": 5,
+                                "type": "input-group",
+                                "body": [
+                                    {
+                                        "type": "link",
+                                        "className": "m-t-sm",
+                                        "icon": "fa fa-group",
+                                        "style": {
+                                            "color": "black",
+                                            "font-weight": "bold",
+                                            "font-size": 15,
+                                            "font-family": "宋体",
+                                        },
+                                        "href": "https://www.baidu.com",
+                                        "body": "ScaleLab",
+                                    },
+                                    {
+                                        "type": "link",
+                                        "className": "m-t-sm m-l-lg",
+                                        "icon": "fa fa-map-marker",
+                                        "style": {
+                                            "color": "black",
+                                            "font-weight": "bold",
+                                            "font-size": 15,
+                                            "font-family": "宋体",
+                                        },
+                                        "href": "https://www.amap.com/",
+                                        "body": "地图",
+                                    }
+                                ]
+                            },
+                            {
+                                "x": 7,
+                                "y": 1,
+                                "h": 1,
+                                "w": 5,
+                                "type": "button-group",
+                                "align": "right",
+                                "buttons": [
+                                    {
+                                        "type": "dropdown-button",
+                                        "label": "设置",
+                                        "icon": "fa fa-gears",
+                                        "btnClassName": "border-none font-black",
+                                        "className": "m-t-xs m-l",
+                                        "style": {
+                                            "color": "black",
+                                            "font-weight": "bold",
+                                            "font-size": 15,
+                                            "font-family": "宋体",
+                                        },
+                                        "closeOnClick": true,
+                                        "level": "sattic-link",
+                                        "hideCaret": true,
+                                        "buttons": [
+                                            {
+                                                "type": "button",
+                                                "label": "按钮1",
+                                            },
+                                            {
+                                                "type": "button",
+                                                "label": "按钮2"
+                                            },
+                                            {
+                                                "type": "button",
+                                                "label": "按钮3"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "button",
+                                        "icon": "fa fa-handshake-o",
+                                        "className": "m-t-xs",
+                                        "style": {
+                                            "color": "black",
+                                            "font-weight": "bold",
+                                            "font-size": 15,
+                                            "font-family": "宋体",
+                                        },
+                                        "label": "联系我们",
+                                        "level": "link",
+                                        "actionType": "dialog",
+                                        "dialog": {
+                                            "title": "建议",
+                                            "closeOnEsc": true,
+                                            "actions": [
+                                                {
+                                                    "label": "提交关闭",
+                                                    "type": "button",
+                                                    "close": true,
+                                                    "level": "primary"
+                                                },
+                                            ],
+                                            "body": {
+                                                "type": "form",
+                                                "api": "/amis/api/mock2/form/saveForm?waitSeconds=2",
+                                                "title": "常规模式",
+                                                "mode": "normal",
+                                                "body": [
+                                                    {
+                                                        "type": "input-image",
+                                                        "name": "image",
+                                                        "label": "问题截图",
+                                                        "multiple": true,
+                                                        "draggable": true
+                                                    },
+                                                    {
+                                                        "type": "textarea",
+                                                        "name": "bug",
+                                                        "placeholder": "请提出建议",
+                                                        "showCounter": true,
+                                                        "maxLength": 100
+
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    },
+
+                                ]
+                            },
+                            {
+                                "x": 4,
+                                "y": 5,
+                                "h": 4,
+                                "w": 5,
+                                "type": "form",
+                                "title": "",
+                                "panelClassName": "border-solid border-0 rounded-none",
+                                "style": {
+                                    "box-shadow": "rgba(118,215,234,0.7) -20px 0px 15px",
+                                    "backgroundColor": "rgba(118,215,234,0.7)",
+                                    "text-shadow": "black 3px 2px 1px"
+                                },
+                                "columnCount": 1,
+                                "body": [
+                                    {
+                                        "type": "tpl",
+                                        "style": {
+                                            "font-size": 80,
+                                            "font-weight": 900,
+                                            "background-image": "-webkit-linear-gradient(top, lightskyblue, skyblue, white)",
+                                            "-webkit-background-clip": "text",
+                                            "-webkit-text-fill-color": "transparent",
+                                            "text-indent": 40,
+                                            "font-family": "楷体"
+                                        },
+                                        "tpl": "地质灾害知识"
+                                    },
+                                    {
+                                        "type": "tpl",
+                                        "style": {
+                                            "font-size": 80,
+                                            "font-weight": 900,
+                                            "background-image": "-webkit-linear-gradient(top, lightskyblue, skyblue, white)",
+                                            "-webkit-background-clip": "text",
+                                            "-webkit-text-fill-color": "transparent",
+                                            "text-indent": 140,
+                                            "font-family": "楷体"
+                                        },
+                                        "tpl": "图谱问答系统"
+                                    },
+                                    {
+                                        "type": "image",
+                                        "className": "m-l-xxl m-r-xxl m-b-n-xs",
+                                        "src": "image/earth.jpg",
+                                        "innerClassName": "border-none",
+                                        "imageMode": "original",
+                                        "width":200,
+                                        "height": 184,
+                                        "model":"online"
+                                    },
+                                    {
+                                        "type": "image",
+                                        "className": "m-l-xxl m-b-n-xs",
+                                        "src": "image/city.jpg",
+                                        "innerClassName": "border-none",
+                                        "imageMode": "original",
+                                        "width":300,
+                                        "height": 184,
+                                        "model":"online"
+                                    }
+                                ], "actions": []
+
+                            },
+                            {
+                                "x": 9,
+                                "y": 5,
+                                "h": 4,
+                                "w": 1,
+                                "type": "form",
+                                "width": 390,
+                                "title": "",
+                                "panelClassName": "border-solid border-0 rounded-none",
+                                "style": {
+                                    "backgroundColor": "rgba(118,215,234,0.7)",
+                                },
+                                "body": [
+                                    {
+                                        "type": "tabs",
+                                        "className": "border-none",
+                                        "tabsMode": "chrome",
+                                        "tabs": [
+                                            {
+                                                "title": "登录",
+                                                "icon": "fa fa-user",
+                                                "body": [
+                                                    {
+                                                        "type": "input-text",
+                                                        "className": "m-l-xl m-r-xl",
+                                                        "name": "name",
+                                                        "borderMode": "half",
+                                                        "inputControlClassName": "bg-gray-100",
+                                                        "placeholder": "请输入用户名/手机号/邮箱"
+                                                    },
+                                                    {
+                                                        "type": "input-password",
+                                                        "className": "m-l-xl m-r-xl",
+                                                        "borderMode": "half",
+                                                        "inputControlClassName": "bg-gray-100",
+                                                        "placeholder": "请输入密码",
+                                                        "name": "password",
+                                                    },
+                                                    {
+                                                        "type": "input-text",
+                                                        "style": {
+                                                            "width": 140
+                                                        },
+                                                        "className": "m-l-xl m-r-xs",
+                                                        "placeholder": "请输入验证码",
+                                                        "name": "code",
+                                                        "mode": "inline"
+                                                    },
+                                                    {
+                                                        "type": "image",
+                                                        "width": 100,
+                                                        "height": 40,
+                                                        "className": "m-t-n-sm",
+                                                        "src": "image/yanzheng.jpg",
+                                                        "mode": "inline"
+                                                    },
+                                                    {
+                                                        "type": "checkbox",
+                                                        "value": true,
+                                                        "className": "m-l-xl m-r-xl",
+                                                        "name": "rememberMe",
+                                                        "option": "记住登录",
+                                                        "mode": "inline"
+                                                    },
+                                                    {
+                                                        "type": "link",
+                                                        "className": "m-l-xxl",
+                                                        "href": "https://www.baidu.com",
+                                                        "body": "忘记密码？",
+                                                        "mode": "inline"
+                                                    },
+                                                    {
+                                                        "type": "button",
+                                                        "label": "登录",
+                                                        "level": "dark",
+                                                        "style": {
+                                                            "width": 260,
+                                                            "font-weight": "bold",
+                                                            "font-size": 20
+                                                        },
+                                                        "className": "m-l-xl",
+                                                        "size": "lg",
+                                                        "mode": "horizontal",
+                                                        "actionType": "confirm",
+                                                        "onEvent": {
+                                                            "click": {
+                                                                "actions": [
+                                                                    {
+                                                                        "actionType": "ajax",
+                                                                        "args": {
+                                                                            "api": {
+                                                                                "method": "post",
+                                                                                "url": "http://yyh.system.com:7861/login",
+                                                                                "data": {
+                                                                                    "name": "${name}",
+                                                                                    "password": "${password}",
+                                                                                    "code": "${code}"
+                                                                                },
+                                                                                "messages": {
+                                                                                    "success": "",
+                                                                                    "failed": "请求失败!"
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    {
+                                                                        "actionType": "link",
+                                                                        "args": {
+                                                                            "link": "${event.data.url}"
+                                                                        }
+                                                                    },
+                                                                    {
+                                                                        "actionType": "toast",
+                                                                        "args": {
+                                                                            "msgType": "info",
+                                                                            "position": "center",
+                                                                            "msg": "${event.data.tpl}"
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        "type": "group",
+                                                        "className": "m-t m-b-none",
+                                                        "body": [
+                                                            {
+                                                                "type": "divider",
+                                                                "style": {
+                                                                    "width": 145
+                                                                },
+                                                                "mode": "inline"
+                                                            },
+                                                            {
+                                                                "type": "tpl",
+                                                                "style": {
+                                                                    "font-weight": "bold",
+                                                                    "font-size": 15,
+                                                                },
+                                                                "tpl": "第三方",
+                                                                "mode": "inline"
+                                                            },
+                                                            {
+                                                                "type": "divider",
+                                                                "style": {
+                                                                    "width": 145
+                                                                },
+                                                                "mode": "inline"
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "type": "image",
+                                                        "className": "m-t-none m-l-xxl",
+                                                        "height": 40,
+                                                        "width": 40,
+                                                        "innerClassName": "border-none",
+                                                        "src": "image/weixin.png",
+                                                        "href": "https://github.com/",
+                                                        "mode": "inline"
+                                                    },
+                                                    {
+                                                        "type": "image",
+                                                        "className": "m-l-xl m-r-xl",
+                                                        "height": 45,
+                                                        "width": 45,
+                                                        "innerClassName": "border-none",
+                                                        "src": "image/qq.png",
+                                                        "href": "https://github.com/",
+                                                        "mode": "inline"
+                                                    },
+                                                    {
+                                                        "type": "image",
+                                                        "className": "m-r-xxl",
+                                                        "height": 40,
+                                                        "width": 40,
+                                                        "innerClassName": "border-none",
+                                                        "src": "image/github.png",
+                                                        "href": "https://github.com/",
+                                                        "mode": "inline"
+                                                    }
+
+                                                ]
+                                            },
+                                            {
+                                                "title": "注册",
+                                                "icon": "fa fa-user-plus",
+                                                "body": [
+                                                    {
+                                                        "type": "input-text",
+                                                        "className": "m-l-xl m-r-xl",
+                                                        "borderMode": "half",
+                                                        "inputControlClassName": "bg-gray-100",
+                                                        "placeholder": "请输入用户名",
+                                                        "name": "password"
+                                                    },
+                                                    {
+                                                        "type": "input-text",
+                                                        "className": "m-l-xl m-r-xl",
+                                                        "name": "email",
+                                                        "borderMode": "half",
+                                                        "inputControlClassName": "bg-gray-100",
+                                                        "placeholder": "请输入邮箱"
+                                                    },
+                                                    {
+                                                        "type": "input-password",
+                                                        "className": "m-l-xl m-r-xl",
+                                                        "borderMode": "half",
+                                                        "inputControlClassName": "bg-gray-100",
+                                                        "placeholder": "请输入密码",
+                                                        "name": "password"
+                                                    },
+                                                    {
+                                                        "type": "input-text",
+                                                        "className": "m-l-xl m-r-xl",
+                                                        "borderMode": "half",
+                                                        "inputControlClassName": "bg-gray-100",
+                                                        "name": "phone-number",
+                                                        "placeholder": "请输入手机号"
+                                                    },
+                                                    {
+                                                        "type": "input-text",
+                                                        "className": "m-l-xl m-r-xl",
+                                                        "placeholder": "请输入验证码",
+                                                        "name": "password",
+                                                        "addOn": {
+                                                            "name": "countdown1",
+                                                            "label": "获取验证码",
+                                                            "type": "button",
+                                                            "countDown": 60,
+                                                            "countDownTpl": "${timeLeft} 秒后重发",
+                                                            "actionType": "ajax",
+                                                            "api": "/amis/api/mock2/form/saveForm?phone=${phone}"
+                                                        }
+                                                    },
+                                                    {
+                                                        "type": "checkbox",
+                                                        "className": "m-l-xl m-t-n",
+                                                        "name": "rememberMe",
+                                                        "option": "同意用户服务条款",
+                                                        "mode": "inline"
+                                                    },
+                                                    {
+                                                        "type": "link",
+                                                        "className": "m-r-xl",
+                                                        "href": "https://www.baidu.com",
+                                                        "body": "查看用户条款",
+                                                        "mode": "inline"
+                                                    },
+                                                    {
+                                                        "type": "button",
+                                                        "label": "注册",
+                                                        "level": "dark",
+                                                        "style": {
+                                                            "width": 270,
+                                                            "font-weight": "bold",
+                                                            "font-size": 20,
+                                                        },
+                                                        "className": "m-l-xl m-b-n-xxs",
+                                                        "size": "lg",
+                                                        "mode": "horizontal",
+                                                    }
+
+                                                ]
+                                            }
+                                        ]
+                                    }
+
+                                ],
+                                "actions": []
+                            }
+                        ]
+                    }
+                ]
+
+
+            }
+
+            let amisScoped = amis.embed('#root', amisJSON);
+        })();
+    </script>
+</body>
+
+</html>

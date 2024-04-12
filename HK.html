@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>HK</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <link rel="stylesheet" href="sdk.css" />
+  <link rel="stylesheet" href="helper.css" />
+  <link rel="stylesheet" href="iconfont.css" />
+  <!-- 这是默认主题所需的，如果是其他主题则不需要 -->
+  <!-- 从 1.1.0 开始 sdk.css 将不支持 IE 11，如果要支持 IE11 请引用这个 css，并把前面那个删了 -->
+  <!-- <link rel="stylesheet" href="sdk-ie11.css" /> -->
+  <!-- 不过 amis 开发团队几乎没测试过 IE 11 下的效果，所以可能有细节功能用不了，如果发现请报 issue -->
+  <style>
+    html,
+    body,
+    .app-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root" class="app-wrapper"></div>
+  <script src="sdk.js"></script>
+  <script type="text/javascript">
+    (function () {
+      let amis = amisRequire('amis/embed');
+
+      let amisJSON = {
+        "type": "page",
+        "style": {
+          "font-family": "楷体",
+          "font-weight": "bold"
+        },
+        "body": [
+          {
+            "type": "grid-2d",
+            "grids": [
+              {
+                "x": 1,
+                "y": 1,
+                "h": 1,
+                "w": 5,
+                "type": "chart",
+                "data": {
+                  "all_data": {
+                    "data_file": "HK_data.json",
+                    "name_file": "HK_nameMap.json",
+                    "title": "Population Density of Hong Kong （2011）",
+                    "little_title": "Data from Wikipedia",
+                    "label": "true",
+                    "tool": "true",
+                    "zoom": "scale",
+                    "zoom_min": 1,
+                    "zoom_max": 6,
+                    "legend": "lightskyblue, yellow, orangered",
+                    "bgcolor": "rgb(255,255,255)"
+                  }
+                },
+                "submitOnInit": true,
+                "mapURL": {
+                  "method": "get",
+                  "url": "http://yyh.system.com:7861/HK_geojson"
+                },
+                "mapName": "HK",
+                "height": 600,
+                "className": "m-l-xxl m-r-xxl",
+                "api": {
+                  "method": "post",
+                  "url": "http://yyh.system.com:7861/Tem_Draw",
+                  "data": {
+                    "input_list": "${all_data}"
+                  }
+                }
+              },
+              {
+                "x": 6,
+                "y": 1,
+                "h": 1,
+                "w": 5,
+                "type": "chart",
+                "name": "map",
+                "submitOnChange": true,
+                "replaceChartOption": true,
+                "data": {
+                  "all_data": {
+                    "data_file": "",
+                    "name_file": "",
+                    "title": "",
+                    "little_title": "",
+                    "label": "",
+                    "tool": "",
+                    "zoom_min": 1,
+                    "zoom_max": 6,
+                    "zoom": "",
+                    "legend": "",
+                    "bgcolor": ""
+                  }
+                },
+                "mapURL": {
+                  "method": "get",
+                  "url": "http://yyh.system.com:7861/HK_geojson"
+                },
+                "mapName": "HK",
+                "height": 600,
+                "className": "m-l-xxl m-r-xxl",
+                "api": {
+                  "method": "post",
+                  "url": "http://yyh.system.com:7861/Tem_Draw",
+                  "data": {
+                    "input_list": "${all_data}"
+                  }
+                }
+              },
+              {
+                "x": 11,
+                "y": 1,
+                "h": 1,
+                "w": 2,
+                "type": "form",
+                "submitOnChange": true,
+                // "debug": true,
+                "panelClassName": "border-solid border-xl rounded-xl",
+                "style": {
+                  "width": 285
+                },
+                "data": {
+                  "all_data": {
+                    "data_file": "",
+                    "name_file": "",
+                    "title": "",
+                    "little_title": "",
+                    "label": "",
+                    "tool": "",
+                    "zoom": "",
+                    "zoom_min": "",
+                    "zoom_max": "",
+                    "legend": "",
+                    "bgcolor": ""
+                  }
+                },
+                "target": "map",
+                "title": "",
+                "body": [
+                  {
+                    "type": "tabs",
+                    "className": "border-none",
+                    "tabsMode": "chrome",
+                    "tabs": [
+                      {
+                        "title": "文件",
+                        "icon": "fa fa-file",
+                        "body": [
+                          {
+                            "type": "input-text",
+                            "name": "all_data.data_file",
+                            "placeholder": "HK.json",
+                            "disabled": true,
+                            "clearable": true,
+                            "enhance": true,
+                            "options": [
+                              {
+                                "label": "HK.json",
+                                "value": "HK.json"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "input-text",
+                            "name": "all_data.data_file",
+                            "placeholder": "数据文件",
+                            "clearable": true,
+                            "enhance": true,
+                            "options": [
+                              {
+                                "label": "HK_data.json",
+                                "value": "HK_data.json"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "input-text",
+                            "name": "all_data.name_file",
+                            "placeholder": "地图块命名文件",
+                            "clearable": true,
+                            "enhance": true,
+                            "options": [
+                              {
+                                "label": "HK_nameMap.json",
+                                "value": "HK_nameMap.json"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "title": "样式",
+                        "icon": "fa fa-th",
+                        "model": "inline",
+                        "body": [
+                          {
+                            "type": "input-text",
+                            "name": "all_data.title",
+                            "placeholder": "标题",
+                            "clearable": true,
+                            "enhance": true,
+                            "options": [
+                              {
+                                "label": "Population Density of Hong Kong （2011）",
+                                "value": "Population Density of Hong Kong （2011）"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "input-text",
+                            "name": "all_data.little_title",
+                            "placeholder": "小标题",
+                            "clearable": true,
+                            "enhance": true,
+                            "options": [
+                              {
+                                "label": "Data from Wikipedia",
+                                "value": "Data from Wikipedia"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "input-color",
+                            "name": "all_data.bgcolor",
+                            "placeholder": "背景颜色",
+                            "format": "rgba",
+                            "clearable": true
+                          },
+                          {
+                            "type": "input-text",
+                            "name": "all_data.legend",
+                            "placeholder": "图例颜色",
+                            "clearable": true,
+                            "enhance": true,
+                            "options": [
+                              {
+                                "label": "lightskyblue, yellow, orangered",
+                                "value": "lightskyblue, yellow, orangered"
+                              },
+                              {
+                                "label": "mistyrose, indianred, orangered, red",
+                                "value": "mistyrose, indianred, orangered, red"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "group",
+                            "body": [
+                              {
+                                "type": "switch",
+                                "name": "all_data.zoom",
+                                "inputClassName": "is-inline",
+                                "label": "是否缩放",
+                                "model": "inline",
+                                "trueValue": "true",
+                                "falseValue": "false",
+                                "onText": "on",
+                                "offText": "off"
+                              },
+                              {
+                                "type": "input-number",
+                                "hiddenOn": "data.all_data.zoom != 'true'",
+                                "name": "all_data.zoom_min",
+                                "style": {
+                                  "width": 60
+                                },
+                                "step": 0.1,
+                                "clearable": true,
+                                "placeholder": "min",
+                                "min": 0,
+                                "className": "m-t-md"
+                              },
+                              {
+                                "type": "input-number",
+                                "hiddenOn": "data.all_data.zoom != 'true'",
+                                "id": "max",
+                                "name": "all_data.zoom_max",
+                                "style": {
+                                  "width": 60
+                                },
+                                "step": 0.1,
+                                "min": 0,
+                                "clearable": true,
+                                "placeholder": "max",
+                                "className": "m-t-md"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "group",
+                            "body": [
+                              {
+                                "type": "switch",
+                                "name": "all_data.tool",
+                                "inputClassName": "is-inline",
+                                "label": "工具栏",
+                                "onText": "on",
+                                "offText": "off",
+                                "trueValue": "true",
+                                "falseValue": "false"
+                              },
+                              {
+                                "type": "switch",
+                                "name": "all_data.label",
+                                "inputClassName": "is-inline",
+                                "label": "标签",
+                                "onText": "on",
+                                "offText": "off",
+                                "trueValue": "true",
+                                "falseValue": "false"
+                              },
+                              {
+                                "type": "button",
+                                "className": "m-b-n-xxl",
+                                "label": "重置",
+                                "level": "primary",
+                                "onEvent": {
+                                  "click": {
+                                    "actions": [
+                                      {
+                                        "actionType": "refresh"
+                                      }
+                                    ]
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "actions": []
+              }
+            ]
+          }
+        ]
+      }
+      let amisScoped = amis.embed('#root', amisJSON);
+    })();
+  </script>
+</body>
+
+</html>

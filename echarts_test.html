@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>amis admin</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <link rel="stylesheet" title="default" href="sdk.css" />
+  <link rel="stylesheet" href="helper.css" />
+  <link rel="stylesheet" href="iconfont.css" />
+  <script src="sdk.js"></script>
+  <script src="https://unpkg.com/vue@2"></script>
+  <script src="https://unpkg.com/history@4.10.1
+/umd/history.js"></script>
+  <style>
+    html,
+    body,
+    .app-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root" class="app-wrapper"></div>
+  <script>
+    (function () {
+      let amis = amisRequire('amis/embed');
+      // 配置前端界面的JSON
+      let amisJSON = {
+        "type": "page",
+        "style": {
+          // "backgroundImage": "html2.jpg",
+          "font-family": "楷体",
+          "font-weight": "bold"
+        },
+        "body": [
+          {
+            "type": "form",
+            "target": "graph",
+            "title":"",
+            "submitOnInit": true,
+            "className": "m-l-xxl m-t-md",
+            "wrapWithPanel": false,
+            // "mode": "inline",
+            // "debug": true,
+            "body": [
+              {
+                "type": "input-file",
+                "name": "file",
+                "label": "File",
+                "accept": "*",
+                "asBlob": true,
+              }
+            ],
+          },
+          {
+            "type": "grid-2d",
+            "grids": [
+              //地图 1,2,11,6
+              {
+                "x": 1,
+                "y": 1,
+                "h": 1,
+                "w": 10,
+                // "gridClassName": "bg-red-300",
+                "type": "chart",
+                "name": "graph",
+                "className": "m-l-xxl m-r-xxl",
+                "replaceChartOption": true,
+                "autoUpload":true,
+                "height": 700,
+                "api": {
+                  "method": "post",
+                  "url": "http://localhost:7861/graph",
+                  "data": {
+                    "query": "${file.path}",
+                  }
+                }
+
+              }
+            ]
+          }
+
+        ]
+
+
+      }
+
+      let amisScoped = amis.embed('#root', amisJSON);
+    })();
+  </script>
+</body>
+
+</html>

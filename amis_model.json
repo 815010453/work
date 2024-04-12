@@ -1,0 +1,25 @@
+{
+    "type": "page",
+    "body": {
+      "type": "container",
+      "className": "page-body",
+      "body": [
+        {
+          "type": "button",
+          "label": "Click Me",
+          "level": "primary",
+          "actionType": "dialog",
+          "onClick": "alert('Button Clicked!');"
+        },
+        {
+          "type": "container",
+          "className": "draggable-container",
+          "body": [],
+          "draggable": true,
+          "onDragOver": "event.preventDefault();",
+          "onDrop": "var component = {\"type\": \"button\", \"label\": \"New Button\", \"level\": \"default\", \"actionType\": \"dialog\", \"onClick\": \"alert('New Button Clicked!');\"}; var newButton = amis.render(component, document.createElement('div')); event.target.appendChild(newButton);"
+        }
+      ]
+    }
+  }
+  
